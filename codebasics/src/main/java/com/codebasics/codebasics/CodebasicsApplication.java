@@ -3,8 +3,11 @@ package com.codebasics.codebasics;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
+@RestController
 
 public class CodebasicsApplication {
 
@@ -19,5 +22,14 @@ public class CodebasicsApplication {
 
 		SpringApplication.run(CodebasicsApplication.class, args);
 	}
+
+	@GetMapping("/")
+	public  String root(){
+		String msg = "hi";
+		return msg;
+	}
+
+
+
 
 }
