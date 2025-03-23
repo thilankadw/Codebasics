@@ -17,15 +17,24 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+    private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
+
+    public SecurityConfig(OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler) {
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF if using JWT
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        auth.requestMatchers("/api/auth/register", "/api/auth/login", "/login/oauth2/**", "/oauth2/**").permitAll()
                                 .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // For JWT
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2SuccessHandler)
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)); //allowing sessions for oauth
 
         return http.build();
     }
