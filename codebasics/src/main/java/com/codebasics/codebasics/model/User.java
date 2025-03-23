@@ -96,4 +96,23 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    public String getProviderId() {
+        return providerId;
+    }
+
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
+    }
+
+    private String provider;
+    private String providerId;
 }
