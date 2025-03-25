@@ -20,10 +20,10 @@ public class PostController {
 
     // Create a post
     @PostMapping("/create")
-    public ResponseEntity<Post> createPost(@RequestParam String description,
-                                           @RequestParam Long userId,
-                                           @RequestParam List<MultipartFile> files) throws IOException {
-        Post createdPost = postService.createPost(description, userId, files);
+    public ResponseEntity<Post> createPost(@RequestParam Long userId,
+                                           @RequestParam String description,
+                                           @RequestParam MultipartFile[] files) throws Exception {
+        Post createdPost = postService.createPost(userId, description, files);
         return ResponseEntity.ok(createdPost);
     }
 
@@ -31,13 +31,14 @@ public class PostController {
     @PutMapping("/update/{postId}")
     public ResponseEntity<Post> updatePost(@PathVariable Long postId,
                                            @RequestParam String description,
-                                           @RequestParam(required = false) List<MultipartFile> files) throws IOException {
+                                           @RequestParam(required = false) MultipartFile[] files) throws Exception {
         Post updatedPost = postService.updatePost(postId, description, files);
         return ResponseEntity.ok(updatedPost);
     }
 
+
     // Get all posts
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<Post>> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
     }
