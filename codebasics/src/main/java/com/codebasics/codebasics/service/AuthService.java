@@ -68,4 +68,27 @@ public class AuthService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
     }
+
+
+    public User updateUser(Long id, RegisterDTO registerDTO) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+
+        // Update the fields
+        existingUser.setUsername(registerDTO.getUsername());
+        existingUser.setEmail(registerDTO.getEmail());
+        existingUser.setPassword(passwordEncoder.encode(registerDTO.getPassword())); // if you want to update the password
+        existingUser.setName(registerDTO.getName());
+
+        // Save the updated user
+        return userRepository.save(existingUser);
+    }
+    public void deleteUser(Long id) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+
+        userRepository.delete(existingUser);
+    }
+
+
 }

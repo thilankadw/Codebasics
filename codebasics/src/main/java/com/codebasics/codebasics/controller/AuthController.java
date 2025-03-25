@@ -39,4 +39,15 @@ public class AuthController {
     public User getUserById(@PathVariable Long id) {
         return authService.getUserById(id);
     }
+    // Update User
+    @PutMapping("/userupdate/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody RegisterDTO registerDTO) {
+        return authService.updateUser(id, registerDTO);
+    }
+
+    // Delete User
+    @DeleteMapping("/usersdelete/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        authService.deleteUser(id);
+    }
 }

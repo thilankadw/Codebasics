@@ -28,7 +28,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF if using JWT
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/register", "/api/auth/login", "/login/oauth2/**", "/oauth2/**","/api/auth/users","/api/auth/users/{id}").permitAll()
+                        auth.requestMatchers("/api/auth/register", "/api/auth/login", "/login/oauth2/**", "/oauth2/**","/api/auth/users","/api/auth/users/{id}","/api/auth/userupdate/{id}","/api/auth/usersdelete/{id}").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
