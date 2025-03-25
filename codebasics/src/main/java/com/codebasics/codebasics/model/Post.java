@@ -15,6 +15,9 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // User who created the post
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostInteraction> interactions;
+
     @ElementCollection
     private List<String> mediaUrls; // List of media URLs (photos or videos)
 
