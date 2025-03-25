@@ -1,2 +1,63 @@
-package com.codebasics.codebasics.controller;public class PostController {
+package com.codebasics.codebasics.controller;
+
+import com.codebasics.codebasics.model.Post;
+import com.codebasics.codebasics.service.PostService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/posts")
+public class PostController {
+    private final PostService postService;
+
+    public PostController(PostService postService) {
+        this.postService = postService;
+    }
+
+    // Create a post
+    @PostMapping("/create")
+    public ResponseEntity<Post> createPost(@RequestParam String description,
+                                           @RequestParam Long userId,
+                                           @RequestParam List<MultipartFile> files) throws IOException {
+        Post createdPost = postService.createPost(description, userId, files);
+        return ResponseEntity.ok(createdPost);
+    }
+
+    // Update a post
+    @PutMapping("/update/{postId}")
+    public ResponseEntity<Post> updatePost(@PathVariable Long postId,
+                                           @RequestParam String description,
+                                           @RequestParam(required = false) List<MultipartFile> files) throws IOException {
+        Post updatedPost = postService.updatePost(postId, description, files);
+        return ResponseEntity.ok(updatedPost);
+    }
+
+    // Get all posts
+    @GetMapping("/")
+    public ResponseEntity<List<Post>> getAllPosts() {
+        return ResponseEntity.ok(postService.getAllPosts());
+    }
+
+    // Get a post by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Post> getPostById(@PathVariable Long id) {
+        return ResponseEntity.ok(postService.getPostById(id));
+    }
+
+    // Get posts by user ID
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Post>> getPostsByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(postService.getPostsByUserId(userId));
+    }
+
+    // Delete a post
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+        return ResponseEntity.noContent().build();
+    }
 }
