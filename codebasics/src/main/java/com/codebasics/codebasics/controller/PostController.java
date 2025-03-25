@@ -1,5 +1,6 @@
 package com.codebasics.codebasics.controller;
 
+import com.codebasics.codebasics.model.ApiResponse;
 import com.codebasics.codebasics.model.Post;
 import com.codebasics.codebasics.service.PostService;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +24,24 @@ public class PostController {
     public ResponseEntity<Post> createPost(@RequestParam Long userId,
                                            @RequestParam String description,
                                            @RequestParam MultipartFile[] files) throws Exception {
+        // Log the files received
+        System.out.println("Number of files: " + files.length);
+        for (MultipartFile file : files) {
+            System.out.println("Received file: " + file.getOriginalFilename());
+        }
+
+        // Ensure files are not more than 3
+        if (files.length > 3) {
+
+            return ResponseEntity.badRequest().body(null); // Return custom error response
+        }
+
+
+
         Post createdPost = postService.createPost(userId, description, files);
         return ResponseEntity.ok(createdPost);
     }
+
 
     // Update a post
     @PutMapping("/update/{postId}")
