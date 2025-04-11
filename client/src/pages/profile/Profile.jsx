@@ -13,10 +13,14 @@ import { useLocation } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
 import Update from "../../components/update/Update";
+import { useParams } from "react-router-dom";
+
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
   const { currentUser } = useContext(AuthContext);
+  const { id } = useParams();
+ 
 
   const userId = parseInt(useLocation().pathname.split("/")[2]);
 
@@ -63,7 +67,7 @@ const Profile = () => {
             </a>
           </div>
           <div className="center">
-            <span>{dummyUser.name}</span>
+            <span>{currentUser.name}</span>
             <div className="info">
               <div className="item">
                 <PlaceIcon />
@@ -89,7 +93,7 @@ const Profile = () => {
         </div>
         <Posts userId={userId} />
       </div>
-      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={dummyUser} />}
+      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={currentUser} />}
     </div>
   );
 };

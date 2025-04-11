@@ -12,6 +12,7 @@ const user = {
   website: "www.johndoe.com",
   coverPic: "cover.jpg",
   profilePic: "profile.jpg",
+  
 };
 
 // Dummy makeRequest object with a simulated PUT request
