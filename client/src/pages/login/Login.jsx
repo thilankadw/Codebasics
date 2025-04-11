@@ -32,7 +32,7 @@ const Login = () => {
         login(userData); 
         console.log(userData)// 📦 pass full user data to AuthContext
 
-       // navigate("/"); // 🎯 navigate after successful login
+        navigate("/"); // 🎯 navigate after successful login
       } else {
         setErr("No token received");
       }
