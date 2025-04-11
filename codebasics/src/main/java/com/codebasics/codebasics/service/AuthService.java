@@ -48,14 +48,28 @@ public class AuthService {
     }
 
     public AuthResponseDTO login(LoginDTO loginDTO) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
+        // Authenticate user
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword())
+        );
 
-        UserDetails user = userRepository.findByUsername(loginDTO.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found!"));
+        // Fetch user details
+        User user = userRepository.findByUsername(loginDTO.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Generate JWT token
         String token = jwtUtil.generateToken(user.getUsername());
 
-        return new AuthResponseDTO(token);
+        // Build response with token + user info
+        AuthResponseDTO response = new AuthResponseDTO();
+        response.setToken(token);
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+
+
+        return response;
     }
 
     // ✅ Get all users
