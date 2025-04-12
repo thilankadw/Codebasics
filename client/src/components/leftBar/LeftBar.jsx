@@ -12,15 +12,12 @@ import Messages from "../../assets/10.png";
 import Tutorials from "../../assets/11.png";
 import Courses from "../../assets/12.png";
 import Fund from "../../assets/13.png";
-// import { AuthContext } from "../../context/authContext";
-// import { useContext } from "react";
+ import { AuthContext } from "../../context/authContext";
+ import { useContext } from "react";
 
 const LeftBar = () => {
-  // Dummy user data (replace with context when backend is ready)
-  const currentUser = {
-    profilePic: "dummyProfilePic.png", // Make sure this image exists in your public/upload folder
-    name: "John Doe",
-  };
+  const { currentUser } = useContext(AuthContext);
+ 
 
   return (
     <div className="leftBar">
