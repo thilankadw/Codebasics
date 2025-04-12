@@ -13,7 +13,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -27,27 +27,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors() // 👈 VERY IMPORTANT! Tell Spring to use your CorsConfigurationSource
-                .and()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 👈 updated style
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(
-                                        "/api/auth/register",
-                                        "/api/auth/login",
-                                        "/login/oauth2/**",
-                                        "/oauth2/**",
-                                        "/api/auth/users",
-                                        "/api/auth/users/{id}",
-                                        "/api/auth/userupdate/{id}",
-                                        "/api/auth/usersdelete/{id}",
-                                        "/api/posts/create",
-                                        "/api/posts/update/{postId}",
-                                        "/api/posts/{id}",
-                                        "/api/posts",
-                                        "/api/posts/user/{userId}",
-                                        "/admin/**"
-                                ).permitAll()
-                                .anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/auth/register",
+                                "/api/auth/login",
+                                "/login/oauth2/**",
+                                "/oauth2/**",
+                                "/api/auth/users",
+                                "/api/auth/users/{id}",
+                                "/api/auth/userupdate/{id}",
+                                "/api/auth/usersdelete/{id}",
+                                "/api/posts/create",
+                                "/api/posts/update/{postId}",
+                                "/api/posts/{id}",
+                                "/api/posts",
+                                "/api/posts/user/{userId}",
+                                "/admin/**",
+                                "/uploads/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2SuccessHandler)
@@ -59,26 +59,28 @@ public class SecurityConfig {
         return http.build();
     }
 
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true);
+
+        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // ✅ List.of instead of Arrays.asList
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true); // ✅ Important for OAuth/session cookies
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", configuration); // ✅ Apply to all routes
         return source;
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(); // ✅ Strong password hashing
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager(); // ✅ Proper way to get AuthenticationManager
     }
 }

@@ -26,7 +26,10 @@ export const AuthContextProvider = ({ children }) => {
       username:userInfo.username,
       profilePic: userInfo.profilePic,
       email: userInfo.email,
-      id:userInfo.id
+      id:userInfo.id,
+      coverPic:userInfo.coverPic,
+      city:userInfo.city,
+      website:userInfo.website
     };
 
     setCurrentUser(userData);

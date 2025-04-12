@@ -24,13 +24,13 @@ const Login = () => {
       const res = await axios.post("http://localhost:8080/api/auth/login", inputs);
 
       // 🌟 Your backend sends: { token, id, username, name, email }
-      const { token, id, username, name, email } = res.data;
+      const { token, id, username, name, email,city,website,coverPic,profilePic } = res.data;
 
       if (token) {
-        const userData = { token, id, username, name, email };
+        const userData = { token, id, username, name, email,city,website,coverPic,profilePic };
         
         login(userData); 
-        console.log(userData)// 📦 pass full user data to AuthContext
+        //console.log(userData)// 📦 pass full user data to AuthContext
 
         navigate("/"); // 🎯 navigate after successful login
       } else {

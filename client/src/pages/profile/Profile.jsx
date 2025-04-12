@@ -9,32 +9,34 @@ import LanguageIcon from "@mui/icons-material/Language";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Posts from "../../components/posts/Posts";
-import { useLocation } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import Update from "../../components/update/Update";
-import { useParams } from "react-router-dom";
-
+import axios from "axios";
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
+  const [user, setUser] = useState(null);
   const { currentUser } = useContext(AuthContext);
   const { id } = useParams();
- 
 
-  const userId = parseInt(useLocation().pathname.split("/")[2]);
+  const userId = parseInt(id);
 
-  // Dummy user data
-  const dummyUser = {
-    id: userId,
-    name: userId === 1 ? "John Doe" : "Jane Smith",
-    city: userId === 1 ? "New York" : "Los Angeles",
-    website: "https://example.com",
-    coverPic: "cover.jpg",
-    profilePic: "profile.jpg",
-  };
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/api/auth/users/${userId}`);
+        setUser(res.data);
+        console.log(res.data);  // log correct data
+      } catch (err) {
+        console.error("Error fetching user:", err);
+      }
+    };
 
-  // Dummy follow relationship state
+    fetchUser();
+  }, [userId]);
+
   const [isFollowing, setIsFollowing] = useState(false);
 
   const handleFollow = () => {
@@ -44,8 +46,25 @@ const Profile = () => {
   return (
     <div className="profile">
       <div className="images">
-        <img src={"/upload/" + dummyUser.coverPic} alt="" className="cover" />
-        <img src={"/upload/" + dummyUser.profilePic} alt="" className="profilePic" />
+      <img
+  src={
+    user?.coverPic
+      ? `http://localhost:8080/uploads/${user.coverPic}`
+      : "/defaultCover.jpg"
+  }
+  alt=""
+  className="cover"
+/>
+<img
+  src={
+    user?.profilePic
+      ? `http://localhost:8080/uploads/${user.profilePic}`
+      : "/defaultProfile.jpg"
+  }
+  alt=""
+  className="profilePic"
+/>
+
       </div>
       <div className="profileContainer">
         <div className="uInfo">
@@ -67,15 +86,15 @@ const Profile = () => {
             </a>
           </div>
           <div className="center">
-            <span>{currentUser.name}</span>
+            <span>{user?.name}</span>
             <div className="info">
               <div className="item">
                 <PlaceIcon />
-                <span>{dummyUser.city}</span>
+                <span>{user?.city}</span>
               </div>
               <div className="item">
                 <LanguageIcon />
-                <span>{dummyUser.website}</span>
+                <span>{user?.website}</span>
               </div>
             </div>
             {userId === currentUser.id ? (

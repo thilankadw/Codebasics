@@ -7,6 +7,12 @@ public class AuthResponseDTO {
     private String name;
     private String email;
 
+    private String city;
+    private String website;
+    private String coverPic;
+    private String profilePic;
+
+
 
     // Default constructor
     public AuthResponseDTO() {
@@ -53,6 +59,38 @@ public class AuthResponseDTO {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public String getCoverPic() {
+        return coverPic;
+    }
+
+    public void setCoverPic(String coverPic) {
+        this.coverPic = coverPic;
+    }
+
+    public String getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
     }
 
     public void setEmail(String email) {
