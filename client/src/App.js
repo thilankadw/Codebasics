@@ -1,27 +1,23 @@
-import Login from "./pages/login/Login";
-import Register from "./pages/register/Register";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Outlet,
-  Navigate,
-} from "react-router-dom";
+import { useContext } from "react";
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { DarkModeContext } from "./context/darkModeContext";
+import { AuthContext } from "./context/authContext";
+
 import Navbar from "./components/navbar/Navbar";
 import LeftBar from "./components/leftBar/LeftBar";
 import RightBar from "./components/rightBar/RightBar";
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
+import LearningPlanHome from "./pages/userLearningPlan/userlearninghome";
+import MyLearningPlans from "./pages/userLearningPlan/mylearningplans";
+import Login from "./pages/login/Login";
+import Register from "./pages/register/Register";
+
 import "./style.scss";
-import { useContext } from "react";
-import { DarkModeContext } from "./context/darkModeContext";
-import { AuthContext } from "./context/authContext";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import LearningPlanHome from './pages/userLearningPlan/userlearninghome';
-import MyLearningPlans from './pages/userLearningPlan/mylearningplans';
 
 function App() {
   const { currentUser } = useContext(AuthContext);
-
   const { darkMode } = useContext(DarkModeContext);
 
   const queryClient = new QueryClient();
@@ -43,11 +39,11 @@ function App() {
     );
   };
 
+  // ✅ Only allow access if user is logged in (has valid token and info)
   const ProtectedRoute = ({ children }) => {
-    if (!currentUser) {
-      return <Navigate to="/login" />;
+    if (!currentUser || !currentUser.token) {
+      return <Navigate to="/login" replace />;
     }
-
     return children;
   };
 
@@ -55,9 +51,9 @@ function App() {
     {
       path: "/",
       element: (
-       
+        <ProtectedRoute>
           <Layout />
-       
+        </ProtectedRoute>
       ),
       children: [
         {
@@ -80,18 +76,16 @@ function App() {
     },
     {
       path: "/login",
-      element: <Login />,
+      element: currentUser ? <Navigate to="/" replace /> : <Login />,
     },
     {
       path: "/register",
-      element: <Register />,
+      element: currentUser ? <Navigate to="/" replace /> : <Register />,
     },
   ]);
 
   return (
-    <div>
-      <RouterProvider router={router} />
-    </div>
+    <RouterProvider router={router} />
   );
 }
 
