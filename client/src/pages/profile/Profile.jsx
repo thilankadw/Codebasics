@@ -90,6 +90,7 @@ const Profile = () => {
             {/* Optional: Add more profile actions here */}
           </div>
         </div>
+        
         <Posts userId={userId} />
       </div>
 
