@@ -17,6 +17,7 @@ const Posts = ({ userId }) => {
           res = await axios.get(`http://localhost:8080/api/posts`);
         }
         setPosts(res.data);
+        console.log(res.data);
       } catch (err) {
         console.error("Failed to fetch posts:", err);
       } finally {
