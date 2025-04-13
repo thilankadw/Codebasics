@@ -106,7 +106,7 @@ public class PostService {
                         throw new RuntimeException("Videos must be 30 seconds or less.");
                     }
                 }
-                mediaUrls.add(filePath);
+                mediaUrls.add(file.getOriginalFilename());
             }
             post.setMediaUrls(mediaUrls);
         }
