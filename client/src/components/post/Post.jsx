@@ -31,23 +31,34 @@ const Post = ({ post }) => {
       <div className="container">
         <div className="user">
           <div className="userInfo">
-            <img src={`https://via.placeholder.com/50`} alt="User" />
+            <img
+              src={post.user.profilePic || "https://via.placeholder.com/50"}
+              alt="User"
+            />
             <div className="details">
-              <Link to={`/profile/${post.userId}`} className="name">
-                {post.name || "John Doe"}
+              <Link to={`/profile/${post.user.id}`} className="name">
+                {post.user.name || "Unknown User"}
               </Link>
-              <span className="date">{moment(post.createdAt || new Date()).fromNow()}</span>
+              <span className="date">
+                {moment(post.createdAt || new Date()).fromNow()}
+              </span>
             </div>
           </div>
           <MoreIcon onClick={() => setMenuOpen(!menuOpen)} />
-          {menuOpen && post.userId === currentUser.id && (
+          {menuOpen && post.user.id === currentUser.id && (
             <button onClick={() => alert("Post deleted (dummy action)")}>Delete</button>
           )}
         </div>
 
         <div className="content">
-          <p>{post.desc || "This is a dummy post description."}</p>
-          {post.img && <img src={`https://via.placeholder.com/200`} alt="Post" />}
+          <p>{post.description || "No description available."}</p>
+          {post.mediaUrls && post.mediaUrls.length > 0 && (
+            <img
+              src={post.mediaUrls[0]} // Just showing the first media
+              alt="Post Media"
+              style={{ maxWidth: "100%", maxHeight: "400px", objectFit: "cover" }}
+            />
+          )}
         </div>
 
         <div className="info">
