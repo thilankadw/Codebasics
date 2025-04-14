@@ -1,38 +1,60 @@
 import { createContext, useEffect, useState } from "react";
 
-// Dummy user data
-const dummyUser = {
-  id: 1,
-  name: "John Doe",
-  email: "johndoe@example.com",
-  profilePic: "profile.jpg",
-  coverPic: "cover.jpg",
-};
-
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-  // Simulate loading user from localStorage or use dummy data
-  const [currentUser, setCurrentUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || dummyUser
-  );
+  const [currentUser, setCurrentUser] = useState(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) return null;
 
-  const login = async (inputs) => {
-    // Simulate a successful login with dummy data
-    console.log("Login attempt with:", inputs);
-    // Here you could validate the inputs or check credentials if needed
+    // Check if token is expired
+    if (new Date().getTime() > storedUser.expiration) {
+      localStorage.removeItem("user");
+      return null;
+    }
+    return storedUser;
+  });
 
-    // Simulate setting the user data after successful login
-    setCurrentUser(dummyUser); // Set dummy user data
+  // 🛡 Login method: Save full user info
+  const login = (userInfo) => {
+    const expirationTime = new Date().getTime() + 1000 * 60 * 60; // 1 hour expiration
+
+    const userData = {
+      token: userInfo.token,
+      expiration: expirationTime,
+      name: userInfo.name,
+      username:userInfo.username,
+      profilePic: userInfo.profilePic,
+      email: userInfo.email,
+      id:userInfo.id,
+      coverPic:userInfo.coverPic,
+      city:userInfo.city,
+      website:userInfo.website
+    };
+
+    setCurrentUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
+  const logout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem("user");
+  };
+
+  // ⏳ Auto logout when token expires
   useEffect(() => {
-    // Store the current user data in localStorage
-    localStorage.setItem("user", JSON.stringify(currentUser));
+    if (!currentUser) return;
+
+    const remainingTime = currentUser.expiration - new Date().getTime();
+    const timer = setTimeout(() => {
+      logout();
+    }, remainingTime);
+
+    return () => clearTimeout(timer);
   }, [currentUser]);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login }}>
+    <AuthContext.Provider value={{ currentUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
