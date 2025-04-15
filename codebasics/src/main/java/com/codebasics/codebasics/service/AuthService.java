@@ -106,7 +106,7 @@ public class AuthService {
         // Update fields
         existingUser.setUsername(registerDTO.getUsername());
         existingUser.setEmail(registerDTO.getEmail());
-        existingUser.setPassword(passwordEncoder.encode(existingUser.getPassword())); // encode updated password
+        existingUser.setPassword(existingUser.getPassword()); // encode updated password
         existingUser.setName(registerDTO.getName());
         existingUser.setWebsite(registerDTO.getWebsite());
         existingUser.setCity(registerDTO.getCity());
