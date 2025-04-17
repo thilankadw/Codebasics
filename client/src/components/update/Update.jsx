@@ -1,87 +1,98 @@
-import { useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import "./update.scss";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-// Dummy user data
-const user = {
-  email: "johndoe@example.com",
-  password: "password123",
-  name: "John Doe",
-  city: "New York",
-  website: "www.johndoe.com",
-  coverPic: "cover.jpg",
-  profilePic: "profile.jpg",
-};
-
-// Dummy makeRequest object with a simulated PUT request
-const dummyMakeRequest = {
-  put: (url, userData) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log("Updated user data:", userData); // Simulate successful update
-        resolve({ data: userData });
-      }, 1000); // Simulate network delay
-    });
-  },
-};
+import axios from "axios";
+import { AuthContext } from "../../context/authContext";
 
 const Update = ({ setOpenUpdate }) => {
   const [cover, setCover] = useState(null);
   const [profile, setProfile] = useState(null);
+  const { currentUser } = useContext(AuthContext);
+  const id = currentUser.id;
+  const [user, setUser] = useState(null);
+  
   const [texts, setTexts] = useState({
-    email: user.email,
-    password: user.password,
-    name: user.name,
-    city: user.city,
-    website: user.website,
+    email: currentUser.email,
+    //password: "password123", // default or blank if you want
+    name: currentUser.name,
+    city: user?.city || " ",
+    website: user?.website || " ",
+    username: currentUser.username
   });
-
-  const upload = async (file) => {
-    console.log(file);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      // Simulate file upload response
-      return new Promise((resolve) => {
-        setTimeout(() => resolve("/upload/" + file.name), 500); // Simulate URL return
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  
 
   const handleChange = (e) => {
     setTexts((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/api/auth/users/${id}`);
+        setUser(res.data);
+        console.log(res.data);
+  
+        // Update texts when user data is fetched
+        setTexts((prev) => ({
+          ...prev,
+          city: res.data.city || "",
+          website: res.data.website || ""
+        }));
+  
+      } catch (err) {
+        console.error("Error fetching user:", err);
+      }
+    };
+  
+    fetchUser();
+  }, [id]);
+  
+
   const queryClient = useQueryClient();
 
   const mutation = useMutation(
-    (user) => {
-      return dummyMakeRequest.put("/users", user);
+    (formData) => {
+      return axios.put(`http://localhost:8080/api/auth/userupdate/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
     },
     {
       onSuccess: () => {
-        // Invalidate and refetch
         queryClient.invalidateQueries(["user"]);
       },
     }
   );
-
   const handleClick = async (e) => {
     e.preventDefault();
-
-    let coverUrl;
-    let profileUrl;
-    coverUrl = cover ? await upload(cover) : user.coverPic;
-    profileUrl = profile ? await upload(profile) : user.profilePic;
-
-    mutation.mutate({ ...texts, coverPic: coverUrl, profilePic: profileUrl });
-    setOpenUpdate(false);
-    setCover(null);
-    setProfile(null);
+  
+    const formData = new FormData();
+    formData.append(
+      "registerDTO",
+      new Blob(
+        [JSON.stringify(texts)],
+        { type: "application/json" }
+      )
+    );
+  
+    if (profile) {
+      formData.append("profilePic", profile);
+    }
+    if (cover) {
+      formData.append("coverPic", cover);
+    }
+  
+    mutation.mutate(formData, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["user"]);
+        setOpenUpdate(false);
+        setCover(null);
+        setProfile(null);
+        window.location.reload(); // <<== ADD THIS to reload the page
+      },
+    });
   };
+  
 
   return (
     <div className="update">
@@ -92,14 +103,16 @@ const Update = ({ setOpenUpdate }) => {
             <label htmlFor="cover">
               <span>Cover Picture</span>
               <div className="imgContainer">
-                <img
-                  src={
-                    cover
-                      ? URL.createObjectURL(cover)
-                      : "/upload/" + user.coverPic
-                  }
-                  alt="cover"
-                />
+              <img
+        src={
+          cover
+            ? URL.createObjectURL(cover)
+            : currentUser.coverPic
+            ? `http://localhost:8080/uploads/${currentUser.coverPic}`
+            : "/cover.jpg"
+        }
+        alt="cover"
+      />
                 <CloudUploadIcon className="icon" />
               </div>
             </label>
@@ -109,26 +122,28 @@ const Update = ({ setOpenUpdate }) => {
               style={{ display: "none" }}
               onChange={(e) => setCover(e.target.files[0])}
             />
-            <label htmlFor="profile">
-              <span>Profile Picture</span>
-              <div className="imgContainer">
-                <img
-                  src={
-                    profile
-                      ? URL.createObjectURL(profile)
-                      : "/upload/" + user.profilePic
-                  }
-                  alt="profile"
-                />
-                <CloudUploadIcon className="icon" />
-              </div>
-            </label>
-            <input
-              type="file"
-              id="profile"
-              style={{ display: "none" }}
-              onChange={(e) => setProfile(e.target.files[0])}
-            />
+          <label htmlFor="profile">
+  <span>Profile Picture</span>
+  <div className="imgContainer">
+  <img
+        src={
+          profile
+            ? URL.createObjectURL(profile)
+            : currentUser.profilePic
+            ? `http://localhost:8080/uploads/${currentUser.profilePic}`
+            : "/defaultProfile.jpg"
+        }
+        alt="profile"
+      />
+    <CloudUploadIcon className="icon" />
+  </div>
+</label>
+<input
+  type="file"
+  id="profile"
+  style={{ display: "none" }}
+  onChange={(e) => setProfile(e.target.files[0])}
+/>
           </div>
           <label>Email</label>
           <input
@@ -137,13 +152,7 @@ const Update = ({ setOpenUpdate }) => {
             name="email"
             onChange={handleChange}
           />
-          <label>Password</label>
-          <input
-            type="text"
-            value={texts.password}
-            name="password"
-            onChange={handleChange}
-          />
+         
           <label>Name</label>
           <input
             type="text"
@@ -154,21 +163,21 @@ const Update = ({ setOpenUpdate }) => {
           <label>Country / City</label>
           <input
             type="text"
-            name="city"
             value={texts.city}
+            name="city"
             onChange={handleChange}
           />
           <label>Website</label>
           <input
             type="text"
-            name="website"
             value={texts.website}
+            name="website"
             onChange={handleChange}
           />
           <button onClick={handleClick}>Update</button>
         </form>
         <button className="close" onClick={() => setOpenUpdate(false)}>
-          close
+          Close
         </button>
       </div>
     </div>
