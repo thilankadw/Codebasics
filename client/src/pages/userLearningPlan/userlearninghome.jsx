@@ -9,7 +9,7 @@ const UserLearningPlanHome = () => {
   const [error, setError] = useState(null);
   const [subscribedPlans, setSubscribedPlans] = useState(new Set());
   const [searchTerm, setSearchTerm] = useState('');
-  const currentUserId = 1; // Replace with actual user ID from your auth system
+  const currentUserId = 2; // Replace with actual user ID from your auth system
 
   // Fetch all plans, public shared plans, and user's subscriptions
   useEffect(() => {
@@ -44,7 +44,7 @@ const UserLearningPlanHome = () => {
     
     fetchData();
   }, [currentUserId]);
-
+ 
   const handleSubscribe = async (planId) => {
     try {
       setIsLoading(true);
