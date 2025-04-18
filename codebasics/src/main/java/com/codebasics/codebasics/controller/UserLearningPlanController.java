@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/user-learning-plans")
 public class UserLearningPlanController {
@@ -88,5 +88,5 @@ public class UserLearningPlanController {
     public ResponseEntity<UserLearningPlan> sharePlan(@PathVariable Long id) {
         UserLearningPlan updatedPlan = userLearningPlanService.updateVisibility(id, "PUBLIC");
         return ResponseEntity.ok(updatedPlan);
-    }
+ }
 }

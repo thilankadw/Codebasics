@@ -1,3 +1,4 @@
+
 package com.codebasics.codebasics.security;
 
 import org.springframework.context.annotation.Bean;
@@ -84,3 +85,10 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager(); // ✅ Proper way to get AuthenticationManager
     }
 }
+
+
+
+
+
+
+
