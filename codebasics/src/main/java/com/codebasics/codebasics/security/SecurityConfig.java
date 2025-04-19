@@ -45,7 +45,10 @@ public class SecurityConfig {
                                 "/api/posts",
                                 "/api/posts/user/{userId}",
                                 "/admin/**",
-                                "/uploads/**"
+                                "/uploads/**",
+                                "/api/users/**",
+                                "/api/post-reaction/**"
+
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
