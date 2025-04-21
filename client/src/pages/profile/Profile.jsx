@@ -1,37 +1,43 @@
 import "./profile.scss";
-import FacebookTwoToneIcon from "@mui/icons-material/FacebookTwoTone";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import PinterestIcon from "@mui/icons-material/Pinterest";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import PlaceIcon from "@mui/icons-material/Place";
-import LanguageIcon from "@mui/icons-material/Language";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import {
+  FacebookTwoTone,
+  LinkedIn,
+  Instagram,
+  Pinterest,
+  Twitter,
+  Place,
+  Language,
+  EmailOutlined,
+} from "@mui/icons-material";
 import Posts from "../../components/posts/Posts";
-import { useLocation } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import Update from "../../components/update/Update";
+import axios from "axios";
+import CreatePost from "../../components/createPost/createPost";
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
+  const [openCreatePost, setOpenCreatePost] = useState(false);
+  const [user, setUser] = useState(null);
   const { currentUser } = useContext(AuthContext);
+  const { id } = useParams();
+  const userId = parseInt(id);
 
-  const userId = parseInt(useLocation().pathname.split("/")[2]);
-
-  // Dummy user data
-  const dummyUser = {
-    id: userId,
-    name: userId === 1 ? "John Doe" : "Jane Smith",
-    city: userId === 1 ? "New York" : "Los Angeles",
-    website: "https://example.com",
-    coverPic: "cover.jpg",
-    profilePic: "profile.jpg",
-  };
-
-  // Dummy follow relationship state
   const [isFollowing, setIsFollowing] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/api/auth/users/${userId}`);
+        setUser(res.data);
+      } catch (err) {
+        console.error("Error fetching user:", err);
+      }
+    };
+    fetchUser();
+  }, [userId]);
 
   const handleFollow = () => {
     setIsFollowing(!isFollowing);
@@ -40,57 +46,58 @@ const Profile = () => {
   return (
     <div className="profile">
       <div className="images">
-        <img src={"/upload/" + dummyUser.coverPic} alt="" className="cover" />
-        <img src={"/upload/" + dummyUser.profilePic} alt="" className="profilePic" />
+        <img
+          src={user?.coverPic ? `http://localhost:8080/uploads/${user.coverPic}` : "/defaultCover.jpg"}
+          alt="Cover"
+          className="cover"
+        />
+        <img
+          src={user?.profilePic ? `http://localhost:8080/uploads/${user.profilePic}` : "/defaultProfile.jpg"}
+          alt="Profile"
+          className="profilePic"
+        />
       </div>
       <div className="profileContainer">
         <div className="uInfo">
           <div className="left">
-            <a href="http://facebook.com">
-              <FacebookTwoToneIcon fontSize="large" />
-            </a>
-            <a href="http://instagram.com">
-              <InstagramIcon fontSize="large" />
-            </a>
-            <a href="http://twitter.com">
-              <TwitterIcon fontSize="large" />
-            </a>
-            <a href="http://linkedin.com">
-              <LinkedInIcon fontSize="large" />
-            </a>
-            <a href="http://pinterest.com">
-              <PinterestIcon fontSize="large" />
-            </a>
+            <a href="http://facebook.com"><FacebookTwoTone fontSize="large" /></a>
+            <a href="http://instagram.com"><Instagram fontSize="large" /></a>
+            <a href="http://twitter.com"><Twitter fontSize="large" /></a>
+            <a href="http://linkedin.com"><LinkedIn fontSize="large" /></a>
+            <a href="http://pinterest.com"><Pinterest fontSize="large" /></a>
           </div>
           <div className="center">
-            <span>{dummyUser.name}</span>
+            <h2>{user?.name}</h2>
             <div className="info">
-              <div className="item">
-                <PlaceIcon />
-                <span>{dummyUser.city}</span>
-              </div>
-              <div className="item">
-                <LanguageIcon />
-                <span>{dummyUser.website}</span>
-              </div>
+              <div className="item"><Place /><span>{user?.city || "Unknown"}</span></div>
+              <div className="item"><Language /><span>{user?.website || "Not provided"}</span></div>
+              <div className="item"><EmailOutlined /><span>{user?.email}</span></div>
             </div>
-            {userId === currentUser.id ? (
-              <button onClick={() => setOpenUpdate(true)}>Update</button>
-            ) : (
-              <button onClick={handleFollow}>
-                {isFollowing ? "Following" : "Follow"}
-              </button>
-            )}
+            <div className="action-buttons">
+              {userId === currentUser.id ? (
+                <>
+                  <button onClick={() => setOpenUpdate(true)}>Update Profile</button>
+                  <button onClick={() => setOpenCreatePost(true)}>Create Post</button>
+                </>
+              ) : (
+                <button onClick={handleFollow}>
+                  {isFollowing ? "Following" : "Follow"}
+                </button>
+              )}
+            </div>
           </div>
           <div className="right">
-            <EmailOutlinedIcon />
-            <MoreVertIcon />
+            {/* Optional: Add more profile actions here */}
           </div>
         </div>
+        
         <Posts userId={userId} />
       </div>
-      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={dummyUser} />}
+
+      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={currentUser} />}
+      {openCreatePost && <CreatePost setOpenCreatePost={setOpenCreatePost} userId={currentUser.id} />}
     </div>
+    
   );
 };
 

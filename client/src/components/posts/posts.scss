@@ -2,4 +2,32 @@
   display: flex;
   flex-direction: column;
   gap: 50px;
+
+
+
+  .posts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h2 {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .search-input {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      font-size: 16px;
+      width: 250px;
+    }
+  }
+
+  .loading, .no-posts {
+    text-align: center;
+    margin-top: 20px;
+  }
 }
