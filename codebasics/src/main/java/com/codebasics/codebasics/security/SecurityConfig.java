@@ -1,3 +1,4 @@
+
 package com.codebasics.codebasics.security;
 
 import org.springframework.context.annotation.Bean;
@@ -45,7 +46,10 @@ public class SecurityConfig {
                                 "/api/posts",
                                 "/api/posts/user/{userId}",
                                 "/admin/**",
-                                "/uploads/**"
+                                "/uploads/**",
+                                "/api/users/**",
+                                "/api/post-reaction/**"
+
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -84,3 +88,10 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager(); // ✅ Proper way to get AuthenticationManager
     }
 }
+
+
+
+
+
+
+

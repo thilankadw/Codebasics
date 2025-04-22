@@ -43,4 +43,15 @@ public class PostInteractionController {
         postInteractionService.deletePostInteraction(id);
         return ResponseEntity.ok("Post Interaction with ID " + id + " has been deleted.");
     }
+    @GetMapping("/post/{postId}/likes")
+    public ResponseEntity<Long> getLikeCount(@PathVariable Long postId) {
+        long likeCount = postInteractionService.getLikeCountByPostId(postId);
+        return ResponseEntity.ok(likeCount);
+    }
+    @GetMapping("/post/{postId}/comments")
+    public ResponseEntity<List<PostInteractionDTO>> getCommentsByPostId(@PathVariable Long postId) {
+        return ResponseEntity.ok(postInteractionService.getCommentsByPostId(postId));
+    }
+
+
 }

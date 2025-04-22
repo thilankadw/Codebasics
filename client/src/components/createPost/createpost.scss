@@ -1,0 +1,133 @@
+@import "../../style.scss";
+
+.createPost {
+  @include themify($themes) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+
+    .wrapper {
+      margin: auto;
+      width: 40%;
+      max-width: 500px;
+      height: 80%;
+      background-color: themed("bg");
+      padding: 30px;
+      overflow-y: auto; /* <-- Important for scrolling on small screens */
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+      position: relative;
+
+      @include mobile {
+        width: 90%;
+        height: 90%;
+        padding: 20px;
+      }
+
+      h1 {
+        color: lightgrey;
+        text-align: center;
+
+        @include mobile {
+          font-size: 22px;
+        }
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        .mediaUpload {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          align-items: center;
+        }
+
+        .imgContainer {
+          position: relative;
+          width: 100px;
+          height: 100px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 50%;
+          background-color: #f1f1f1;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid themed("border");
+          }
+
+          .icon {
+            font-size: 30px;
+            color: lightgray;
+            cursor: pointer;
+            opacity: 0.7;
+          }
+        }
+
+        label {
+          color: gray;
+          font-size: 14px;
+          cursor: pointer;
+        }
+
+        textarea {
+          padding: 10px;
+          border: 1px solid themed("border");
+          font-size: 14px;
+          color: gray;
+          resize: vertical;
+          min-height: 80px;
+          background-color: transparent;
+        }
+
+        button {
+          margin-top: 10px;
+          border: none;
+          padding: 12px;
+          border-radius: 5px;
+          cursor: pointer;
+          color: white;
+          background-color: #5271ff;
+          font-size: 16px;
+          font-weight: bold;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background-color: #3952d2;
+          }
+        }
+      }
+
+      .close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        border: none;
+        background-color: #f0544f;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+      }
+    }
+  }
+}
