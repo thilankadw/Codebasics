@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import "./login.scss";
 import axios from "axios";
+import googleicon from "../../assets/google.png";
 
 const Login = () => {
   const [inputs, setInputs] = useState({
@@ -88,7 +89,7 @@ const Login = () => {
             </div>
             <button className="google-btn" onClick={handleGoogleLogin}>
               <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" 
+                src={googleicon} 
                 alt="Google Logo" 
               />
               Sign in with Google
