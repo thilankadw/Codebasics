@@ -1,0 +1,22 @@
+@import '../../styles/mixins';
+@import '../../styles/themes';
+@import '../../styles/variables';
+
+.phase-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-unit;
+  
+    .form-group {
+      label {
+        @include themify($themes) {
+          color: themed('textColorSoft');
+        }
+        font-size: 14px;
+      }
+    }
+  
+    @include tablet {
+      grid-template-columns: 1fr;
+    }
+  }

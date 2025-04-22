@@ -1,0 +1,216 @@
+@use '../../styles/variables' as vars;
+@use '../../styles/mixins' as mix;
+@use '../../styles/themes' as th;
+
+.learning-plan-form {
+  @include mix.themify(th.$themes) {
+    background-color: themed('cardBg');
+    color: themed('textColor');
+  }
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  max-width: 900px;
+  margin: 0 auto;
+
+  .form-header {
+    margin-bottom: 2rem;
+    
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+      @include mix.themify(th.$themes) {
+        color: themed('primary');
+      }
+    }
+    
+    p {
+      margin: 0;
+      @include mix.themify(th.$themes) {
+        color: themed('textColorSoft');
+      }
+    }
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      @include mix.themify(th.$themes) {
+        color: themed('textColorSoft');
+      }
+    }
+
+    input, textarea {
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      @include mix.themify(th.$themes) {
+        border: 1px solid themed('border');
+        background-color: themed('bgSoft');
+        color: themed('textColor');
+      }
+
+      &::placeholder {
+        @include mix.themify(th.$themes) {
+          color: themed('textColorSoft');
+        }
+        opacity: 0.7;
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+  }
+
+  .image-url-input {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .image-preview {
+      width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      @include mix.themify(th.$themes) {
+        border: 1px solid themed('border');
+      }
+
+      img {
+        max-width: 100%;
+        max-height: 200px;
+        object-fit: contain;
+      }
+    }
+  }
+
+  .phases-section {
+    margin: 2rem 0;
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      h3 {
+        margin: 0;
+        font-size: 1.3rem;
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      border-radius: 8px;
+      @include mix.themify(th.$themes) {
+        background-color: themed('bgSoft');
+        color: themed('textColorSoft');
+      }
+    }
+
+    .phases-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .phase-card {
+      border-radius: 8px;
+      padding: 1.5rem;
+      @include mix.themify(th.$themes) {
+        background-color: themed('bgSoft');
+        border: 1px solid themed('border');
+      }
+
+      .phase-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        .phase-number {
+          font-weight: 600;
+          @include mix.themify(th.$themes) {
+            color: themed('primary');
+          }
+        }
+      }
+    }
+  }
+
+  .add-phase-btn {
+    @include mix.button(info);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+
+    span {
+      font-size: 1.2rem;
+    }
+  }
+
+  .remove-phase-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.2rem;
+    line-height: 1;
+    @include mix.themify(th.$themes) {
+      color: themed('danger');
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+  }
+
+  .submit-btn {
+    @include mix.button;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px;
+  }
+
+  @include mix.tablet {
+    padding: 1.5rem;
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+}
