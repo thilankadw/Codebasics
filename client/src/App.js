@@ -15,6 +15,7 @@ import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 
 import "./style.scss";
+import OAuth2RedirectHandler from "./pages/oauth/OAuth2RedirectHandler";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -81,6 +82,10 @@ function App() {
     {
       path: "/register",
       element: currentUser ? <Navigate to="/" replace /> : <Register />,
+    },
+    {
+      path: "/oauth2/redirect",
+      element: <OAuth2RedirectHandler />,
     },
   ]);
 
