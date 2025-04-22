@@ -16,6 +16,8 @@ import Register from "./pages/register/Register";
 
 import "./style.scss";
 import OAuth2RedirectHandler from "./pages/oauth/OAuth2RedirectHandler";
+import CreateLearningPlanPage from "./pages/learningplan/CreateLearningPlanPage";
+import ViewLearningPlanPage from "./pages/learningplan/ViewLearningPlanPage";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -72,6 +74,14 @@ function App() {
         {
           path: "/mylearning-plans",
           element: <MyLearningPlans />,
+        },
+        {
+          path: "/create-new-learning-plan",
+          element: <CreateLearningPlanPage />,
+        },
+        {
+          path: "/view-learning-plan/:id",
+          element: <ViewLearningPlanPage />,
         },
       ],
     },
