@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from "react";
+import axios from "axios";
 
 export const AuthContext = createContext();
 
@@ -51,6 +52,14 @@ export const AuthContextProvider = ({ children }) => {
     }, remainingTime);
 
     return () => clearTimeout(timer);
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (currentUser?.token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${currentUser.token}`;
+    } else {
+      delete axios.defaults.headers.common["Authorization"];
+    }
   }, [currentUser]);
 
   return (
