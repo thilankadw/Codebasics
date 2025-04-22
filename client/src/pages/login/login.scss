@@ -80,7 +80,71 @@
           font-weight: bold;
           cursor: pointer;
         }
+        .error {
+          color: red;
+          font-size: 14px;
+          margin-top: -20px;
+        }
+      }
+      .social-login {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        .divider {
+          position: relative;
+          text-align: center;
+          margin: 10px 0;
+          
+          &:before, &:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background-color: lightgray;
+          }
+          
+          &:before {
+            left: 0;
+          }
+          
+          &:after {
+            right: 0;
+          }
+          
+          span {
+            background: white;
+            padding: 0 10px;
+            color: #777;
+          }
+        }
+
+        .google-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          background-color: white;
+          color: #444;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background-color 0.3s;
+          
+          &:hover {
+            background-color: #f5f5f5;
+          }
+          
+          img {
+            width: 18px;
+            height: 18px;
+          }
+        }
       }
     }
   }
 }
+
