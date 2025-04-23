@@ -5,8 +5,6 @@ import { Link } from "react-router-dom";
 import LearningPlan from "../../assets/learningplan.png";
 import NewPlan from "../../assets/newplan.png";
 import SubscribePlan from "../../assets/subscribeplan.png";
-import { AuthContext } from "../../context/authContext";
-import { useContext } from "react";
 
 const LeftBar = () => {
   const { currentUser } = useContext(AuthContext);

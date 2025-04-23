@@ -68,7 +68,7 @@ const Profile = () => {
               <div className="item"><EmailOutlined /><span>{user?.email}</span></div>
             </div>
             <div className="action-buttons">
-              {userId === currentUser.id ? (
+              {userId === parseInt(currentUser.id) ? (
                 <>
                   <button onClick={() => setOpenUpdate(true)}>Update Profile</button>
                   <button onClick={() => setOpenCreatePost(true)}>Create Post</button>
