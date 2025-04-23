@@ -16,6 +16,17 @@ const ViewLearningPlanPage = () => {
             try {
             } catch (error) {
                 console.error('Error fetching learning plan:', error);
+                toast.error('Error fetching learning plan.', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
                 // navigate('/');
             }
         };
@@ -28,6 +39,17 @@ const ViewLearningPlanPage = () => {
             
         } catch (error) {
             console.error('Error deleting learning plan:', error);
+            toast.error('Error deleting learning plan.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+            });
         }
     };
 

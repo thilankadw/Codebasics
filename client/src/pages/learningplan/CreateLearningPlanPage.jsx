@@ -73,9 +73,9 @@ const CreateLearningPlanPage = () => {
                     transition: Bounce,
                 }
             );
-            
+
             console.log('Learning plan created:', response.data);
-            navigate('/'); 
+            navigate('/');
         } catch (error) {
             console.error('Error submitting learning plan:', error);
             toast.error('Failed to submit learning plan. Please try again.', {

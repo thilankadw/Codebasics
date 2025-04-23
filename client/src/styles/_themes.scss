@@ -6,8 +6,8 @@ $themes: (
     bgSoft: #f6f3f3,
     textColorSoft: #555,
     border: lightgray,
-    primary: #4CAF50,
-    primaryHover: #45a049,
+    primary: #1EA9FF,
+    primaryHover: #195f8a,
     danger: #f44336,
     dangerHover: #d32f2f,
     info: #2196F3,
@@ -17,22 +17,4 @@ $themes: (
     phaseCardBg: #f9f9f9,
     resourcesBg: #f0f0f0
   ),
-  dark: (
-    textColor: whitesmoke,
-    bg: #222,
-    logo: white,
-    bgSoft: #333,
-    textColorSoft: lightgray,
-    border: #444,
-    primary: #388E3C,
-    primaryHover: #2E7D32,
-    danger: #D32F2F,
-    dangerHover: #B71C1C,
-    info: #1976D2,
-    infoHover: #1565C0,
-    cardBg: #333,
-    cardBorder: #444,
-    phaseCardBg: #444,
-    resourcesBg: #555
-  )
 ) !default;
