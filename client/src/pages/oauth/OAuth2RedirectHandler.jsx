@@ -17,7 +17,7 @@ const OAuth2RedirectHandler = () => {
     };
 
     const token = getUrlParameter("token");
-    const id = getUrlParameter("id");
+    const id = parseInt(getUrlParameter("id"));
     const username = getUrlParameter("username");
     const name = getUrlParameter("name");
     const email = getUrlParameter("email");

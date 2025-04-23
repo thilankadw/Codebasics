@@ -16,9 +16,6 @@ import CreateLearningPlanPage from "./pages/learningplan/CreateLearningPlanPage"
 import ViewLearningPlanPage from "./pages/learningplan/ViewLearningPlanPage";
 import ViewAllLearningPlansPage from "./pages/learningplan/ViewAllLearningPlansPage";
 import { ToastContainer, toast } from 'react-toastify';
-import OAuth2RedirectHandler from "./pages/oauth/OAuth2RedirectHandler";
-import CreateLearningPlanPage from "./pages/learningplan/CreateLearningPlanPage";
-import ViewLearningPlanPage from "./pages/learningplan/ViewLearningPlanPage";
 import "./style.scss";
 
 function App() {
