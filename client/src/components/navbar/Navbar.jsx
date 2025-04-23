@@ -2,13 +2,28 @@ import "./navbar.scss";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import { DarkModeContext } from "../../context/darkModeContext";
 import Logo from '../../assets/logo.png';
+import axios from "axios";
 
 const Navbar = () => {
   const { currentUser } = useContext(AuthContext);
+  const [user, setUser] = useState(null);
+  const userId = parseInt(currentUser.id);
+
+  useEffect(() => {
+      const fetchUser = async () => {
+        try {
+          const res = await axios.get(`http://localhost:8080/api/auth/users/${userId}`);
+          setUser(res.data);
+        } catch (err) {
+          console.error("Error fetching user:", err);
+        }
+      };
+      fetchUser();
+    }, [userId]);
 
   return (
     <div className="navbar">
@@ -28,7 +43,7 @@ const Navbar = () => {
           <Link to={`/profile/${currentUser.id}`} style={{ textDecoration: "none", color: "inherit" }}>
             <div className="user">
               <img
-                src={currentUser?.coverPic ? `http://localhost:8080/uploads/${currentUser.coverPic}` : "/defaultCover.jpg"}
+                src={user?.profilePic ? `http://localhost:8080/uploads/${user.profilePic}` : "/defaultCover.jpg"}
                 alt={currentUser.name || "User"}
               />
               <span>{currentUser.name || "Guest"}</span>
