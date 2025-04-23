@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getLearningPlanById, deleteLearningPlan } from '../../services/api';
-
+import { toast, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const ViewLearningPlanPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -13,6 +14,17 @@ const ViewLearningPlanPage = () => {
             try {
             } catch (error) {
                 console.error('Error fetching learning plan:', error);
+                toast.error('Error fetching learning plan.', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
                 // navigate('/');
             }
         };
@@ -25,6 +37,17 @@ const ViewLearningPlanPage = () => {
             
         } catch (error) {
             console.error('Error deleting learning plan:', error);
+            toast.error('Error deleting learning plan.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+            });
         }
     };
 

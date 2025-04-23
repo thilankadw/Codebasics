@@ -3,33 +3,20 @@
 @use '../../styles/themes' as th;
 
 .learning-plan-form {
-  @include mix.themify(th.$themes) {
-    background-color: themed('cardBg');
-    color: themed('textColor');
-  }
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   max-width: 900px;
-  margin: 0 auto;
+  margin: 10px auto;
 
   .form-header {
     margin-bottom: 2rem;
     
     h2 {
       font-size: 1.8rem;
-      font-weight: 600;
+      font-weight: 700;
+      text-align: center;
       margin: 0 0 0.5rem;
-      @include mix.themify(th.$themes) {
-        color: themed('primary');
-      }
-    }
-    
-    p {
-      margin: 0;
-      @include mix.themify(th.$themes) {
-        color: themed('textColorSoft');
-      }
     }
   }
 
@@ -52,21 +39,14 @@
     label {
       font-size: 0.9rem;
       font-weight: 500;
-      @include mix.themify(th.$themes) {
-        color: themed('textColorSoft');
-      }
     }
 
     input, textarea {
-      padding: 0.8rem 1rem;
+      padding: 0.5rem 1rem;
       border-radius: 8px;
       font-size: 1rem;
       transition: all 0.2s ease;
-      @include mix.themify(th.$themes) {
-        border: 1px solid themed('border');
-        background-color: themed('bgSoft');
-        color: themed('textColor');
-      }
+      resize: none;
 
       &::placeholder {
         @include mix.themify(th.$themes) {
@@ -77,7 +57,8 @@
     }
 
     textarea {
-      resize: vertical;
+      border: 4px solid themed('border');
+      resize: none;
       min-height: 100px;
     }
   }
@@ -95,9 +76,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      @include mix.themify(th.$themes) {
-        border: 1px solid themed('border');
-      }
 
       img {
         max-width: 100%;
@@ -126,10 +104,6 @@
       text-align: center;
       padding: 2rem;
       border-radius: 8px;
-      @include mix.themify(th.$themes) {
-        background-color: themed('bgSoft');
-        color: themed('textColorSoft');
-      }
     }
 
     .phases-list {
@@ -141,10 +115,6 @@
     .phase-card {
       border-radius: 8px;
       padding: 1.5rem;
-      @include mix.themify(th.$themes) {
-        background-color: themed('bgSoft');
-        border: 1px solid themed('border');
-      }
 
       .phase-card-header {
         display: flex;
@@ -154,9 +124,6 @@
 
         .phase-number {
           font-weight: 600;
-          @include mix.themify(th.$themes) {
-            color: themed('primary');
-          }
         }
       }
     }
@@ -167,12 +134,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.6rem 1rem;
     font-size: 0.9rem;
-
-    span {
-      font-size: 1.2rem;
-    }
   }
 
   .remove-phase-btn {
@@ -182,9 +144,6 @@
     cursor: pointer;
     padding: 0.2rem;
     line-height: 1;
-    @include mix.themify(th.$themes) {
-      color: themed('danger');
-    }
 
     &:hover {
       opacity: 0.8;
@@ -193,24 +152,14 @@
 
   .form-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     margin-top: 2rem;
   }
 
   .submit-btn {
-    @include mix.button;
-    padding: 0.8rem 2rem;
-    font-size: 1rem;
+    @include mix.button(submit);
     font-weight: 500;
     border-radius: 8px;
-  }
-
-  @include mix.tablet {
-    padding: 1.5rem;
-
-    .form-grid {
-      grid-template-columns: 1fr;
-    }
   }
 
 }

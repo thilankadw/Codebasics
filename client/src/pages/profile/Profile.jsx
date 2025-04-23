@@ -59,13 +59,7 @@ const Profile = () => {
       </div>
       <div className="profileContainer">
         <div className="uInfo">
-          <div className="left">
-            <a href="http://facebook.com"><FacebookTwoTone fontSize="large" /></a>
-            <a href="http://instagram.com"><Instagram fontSize="large" /></a>
-            <a href="http://twitter.com"><Twitter fontSize="large" /></a>
-            <a href="http://linkedin.com"><LinkedIn fontSize="large" /></a>
-            <a href="http://pinterest.com"><Pinterest fontSize="large" /></a>
-          </div>
+          
           <div className="center">
             <h2>{user?.name}</h2>
             <div className="info">
@@ -86,8 +80,14 @@ const Profile = () => {
               )}
             </div>
           </div>
+          <div className="left">
+            <a href="http://facebook.com"><FacebookTwoTone fontSize="large" /></a>
+            <a href="http://instagram.com"><Instagram fontSize="large" /></a>
+            <a href="http://twitter.com"><Twitter fontSize="large" /></a>
+            <a href="http://linkedin.com"><LinkedIn fontSize="large" /></a>
+            <a href="http://pinterest.com"><Pinterest fontSize="large" /></a>
+          </div>
           <div className="right">
-            {/* Optional: Add more profile actions here */}
           </div>
         </div>
         

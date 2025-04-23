@@ -9,14 +9,7 @@
   
     .form-group {
       label {
-        @include themify($themes) {
-          color: themed('textColorSoft');
-        }
         font-size: 14px;
       }
-    }
-  
-    @include tablet {
-      grid-template-columns: 1fr;
     }
   }

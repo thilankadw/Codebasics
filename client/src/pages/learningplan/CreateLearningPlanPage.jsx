@@ -2,7 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import LearningPlanForm from '../../components/learningplan/LearningPlanForm';
-
+import { toast, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const CreateLearningPlanPage = () => {
     const navigate = useNavigate();
 
@@ -17,12 +18,22 @@ const CreateLearningPlanPage = () => {
                     },
                 }
             );
-            
+
             console.log('Learning plan created:', response.data);
-            navigate('/'); 
+            navigate('/');
         } catch (error) {
             console.error('Error creating learning plan:', error);
-            alert('Failed to create learning plan. Please try again.');
+            toast.error('Failed to create learning plan. Please try again.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+            });
         }
     };
 

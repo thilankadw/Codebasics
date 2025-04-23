@@ -19,15 +19,11 @@ const Share = () => {
       <div className="container">
         <div className="top" onClick={handleOpenCreatePost} style={{ cursor: "pointer" }}>
           <div className="left">
-            <img src={"/upload/" + currentUser.profilePic} alt="profile" />
+            <img src={currentUser?.coverPic ? `http://localhost:8080/uploads/${currentUser.coverPic}` : "/defaultCover.jpg"} />
             <input
               type="text"
               placeholder={`What's on your mind, ${currentUser.name}?`}
-              disabled
             />
-          </div>
-          <div className="right">
-            {/* You could optionally show a preview here */}
           </div>
         </div>
 
@@ -41,9 +37,9 @@ const Share = () => {
             </div>
            
           </div>
-          <div className="right">
+          {/* <div className="right">
             <button onClick={handleOpenCreatePost}>Share</button>
-          </div>
+          </div> */}
         </div>
       </div>
 
