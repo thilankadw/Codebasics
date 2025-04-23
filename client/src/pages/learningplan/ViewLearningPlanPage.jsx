@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getLearningPlanById, deleteLearningPlan } from '../../services/api';
 import { toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './ViewLearningPlanPage.scss';
+
 const ViewLearningPlanPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();

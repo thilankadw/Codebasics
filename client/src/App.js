@@ -11,6 +11,10 @@ import LearningPlanHome from "./pages/userLearningPlan/userlearninghome";
 import MyLearningPlans from "./pages/userLearningPlan/mylearningplans";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
+import OAuth2RedirectHandler from "./pages/oauth/OAuth2RedirectHandler";
+import CreateLearningPlanPage from "./pages/learningplan/CreateLearningPlanPage";
+import ViewLearningPlanPage from "./pages/learningplan/ViewLearningPlanPage";
+import ViewAllLearningPlansPage from "./pages/learningplan/ViewAllLearningPlansPage";
 import { ToastContainer, toast } from 'react-toastify';
 import OAuth2RedirectHandler from "./pages/oauth/OAuth2RedirectHandler";
 import CreateLearningPlanPage from "./pages/learningplan/CreateLearningPlanPage";
@@ -76,8 +80,16 @@ function App() {
           element: <CreateLearningPlanPage />,
         },
         {
+          path: "/update-learning-plan/:id",
+          element: <CreateLearningPlanPage />,
+        },
+        {
           path: "/view-learning-plan/:id",
           element: <ViewLearningPlanPage />,
+        },
+        {
+          path: "/all-learning-plans",
+          element: <ViewAllLearningPlansPage />,
         },
       ],
     },
