@@ -3,17 +3,19 @@ import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-rou
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
-
 import Navbar from "./components/navbar/Navbar";
 import LeftBar from "./components/leftBar/LeftBar";
-import RightBar from "./components/rightBar/RightBar";
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
 import LearningPlanHome from "./pages/userLearningPlan/userlearninghome";
 import MyLearningPlans from "./pages/userLearningPlan/mylearningplans";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
-
+import OAuth2RedirectHandler from "./pages/oauth/OAuth2RedirectHandler";
+import CreateLearningPlanPage from "./pages/learningplan/CreateLearningPlanPage";
+import ViewLearningPlanPage from "./pages/learningplan/ViewLearningPlanPage";
+import ViewAllLearningPlansPage from "./pages/learningplan/ViewAllLearningPlansPage";
+import { ToastContainer, toast } from 'react-toastify';
 import "./style.scss";
 
 function App() {
@@ -32,14 +34,12 @@ function App() {
             <div style={{ flex: 6 }}>
               <Outlet />
             </div>
-            <RightBar />
           </div>
         </div>
       </QueryClientProvider>
     );
   };
 
-  // ✅ Only allow access if user is logged in (has valid token and info)
   const ProtectedRoute = ({ children }) => {
     if (!currentUser || !currentUser.token) {
       return <Navigate to="/login" replace />;
@@ -72,6 +72,22 @@ function App() {
           path: "/mylearning-plans",
           element: <MyLearningPlans />,
         },
+        {
+          path: "/create-new-learning-plan",
+          element: <CreateLearningPlanPage />,
+        },
+        {
+          path: "/update-learning-plan/:id",
+          element: <CreateLearningPlanPage />,
+        },
+        {
+          path: "/view-learning-plan/:id",
+          element: <ViewLearningPlanPage />,
+        },
+        {
+          path: "/all-learning-plans",
+          element: <ViewAllLearningPlansPage />,
+        },
       ],
     },
     {
@@ -82,10 +98,17 @@ function App() {
       path: "/register",
       element: currentUser ? <Navigate to="/" replace /> : <Register />,
     },
+    {
+      path: "/oauth2/redirect",
+      element: <OAuth2RedirectHandler />,
+    },
   ]);
 
   return (
-    <RouterProvider router={router} />
+    <>
+      <RouterProvider router={router} />
+      <ToastContainer/>
+    </>
   );
 }
 

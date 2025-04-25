@@ -34,8 +34,23 @@ public class PostInteractionService {
 
         Post post = postOpt.get();
 
-        if (postInteractionDTO.getType() == InteractionType.COMMENT && (postInteractionDTO.getContent() == null || postInteractionDTO.getContent().isEmpty())) {
-            throw new RuntimeException("Content is required for comment type");
+        // Handle COMMENT
+        if (postInteractionDTO.getType() == InteractionType.COMMENT) {
+            if (postInteractionDTO.getContent() == null || postInteractionDTO.getContent().isEmpty()) {
+                throw new RuntimeException("Content is required for comment type");
+            }
+        }
+
+        // Handle REACTION: only allow one like per user per post
+        if (postInteractionDTO.getType() == InteractionType.REACTION) {
+            boolean alreadyLiked = postInteractionRepository.existsByUserIdAndPostIdAndType(
+                    postInteractionDTO.getUserId(),
+                    postInteractionDTO.getPostId(),
+                    InteractionType.REACTION
+            );
+            if (alreadyLiked) {
+                throw new RuntimeException("User already liked this post.");
+            }
         }
 
         PostInteraction postInteraction = new PostInteraction(
@@ -47,7 +62,6 @@ public class PostInteractionService {
         postInteraction.setTimestamp(LocalDateTime.now());
 
         PostInteraction savedPostInteraction = postInteractionRepository.save(postInteraction);
-
         return modelMapper.map(savedPostInteraction, PostInteractionDTO.class);
     }
 
@@ -59,7 +73,8 @@ public class PostInteractionService {
 
         PostInteraction postInteraction = postInteractionOpt.get();
 
-        if (postInteractionDTO.getType() == InteractionType.COMMENT && (postInteractionDTO.getContent() == null || postInteractionDTO.getContent().isEmpty())) {
+        if (postInteractionDTO.getType() == InteractionType.COMMENT &&
+                (postInteractionDTO.getContent() == null || postInteractionDTO.getContent().isEmpty())) {
             throw new RuntimeException("Content is required for comment type");
         }
 
@@ -86,4 +101,15 @@ public class PostInteractionService {
         List<PostInteraction> postInteractions = postInteractionRepository.findAll();
         return modelMapper.map(postInteractions, new TypeToken<List<PostInteractionDTO>>() {}.getType());
     }
+
+    public long getLikeCountByPostId(Long postId) {
+        return postInteractionRepository.countByPostIdAndType(postId, InteractionType.REACTION);
+    }
+
+
+    public List<PostInteractionDTO> getCommentsByPostId(Long postId) {
+        List<PostInteraction> comments = postInteractionRepository.findByPostIdAndType(postId, InteractionType.COMMENT);
+        return modelMapper.map(comments, new TypeToken<List<PostInteractionDTO>>() {}.getType());
+    }
+
 }
