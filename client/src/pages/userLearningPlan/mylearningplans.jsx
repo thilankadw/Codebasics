@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import './userlearningplan.css';
+import { AuthContext } from '../../context/authContext';
 
 const MyLearningPlansPage = () => {
+    const { currentUser } = useContext(AuthContext);
   const [myLearningPlans, setMyLearningPlans] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [userId, setUserId] = useState('2');
+  const [userId, setUserId] = useState(null);
   const [editingPlan, setEditingPlan] = useState(null);
   const [viewingPlan, setViewingPlan] = useState(null);
   const [editFormData, setEditFormData] = useState({
@@ -24,7 +26,11 @@ const MyLearningPlansPage = () => {
   const [planToDelete, setPlanToDelete] = useState(null);
 
   useEffect(() => {
-    fetchLearningPlans();
+    setUserId(currentUser.id);
+  }, [currentUser])
+
+  useEffect(() => {
+    if(userId) fetchLearningPlans();
   }, [userId]);
 
   const showAlert = (message, type) => {

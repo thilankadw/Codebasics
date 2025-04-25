@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import './userlearningplan.css';
+import { AuthContext } from '../../context/authContext';
 
 const UserLearningPlanHome = () => {
+   const { currentUser } = useContext(AuthContext);
   const [allLearningPlans, setAllLearningPlans] = useState([]);
   const [publicSharedPlans, setPublicSharedPlans] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [subscribedPlans, setSubscribedPlans] = useState(new Set());
   const [searchTerm, setSearchTerm] = useState('');
-  const currentUserId = 2; // Replace with actual user ID from your auth system
+  const [currentUserId, setCurrentUserId] = useState(null);// Replace with actual user ID from your auth system
 
+  useEffect(() => {
+    setCurrentUserId(currentUser.id);
+  }, [currentUser])
   // Fetch all plans, public shared plans, and user's subscriptions
   useEffect(() => {
     const fetchData = async () => {
@@ -42,7 +47,7 @@ const UserLearningPlanHome = () => {
       }
     };
     
-    fetchData();
+   if(currentUserId) fetchData();
   }, [currentUserId]);
  
   const handleSubscribe = async (planId) => {
