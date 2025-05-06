@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import './userlearningplan.css';
 import { AuthContext } from '../../context/authContext';
+import { Link } from 'react-router-dom';
 
 const MyLearningPlansPage = () => {
     const { currentUser } = useContext(AuthContext);
@@ -24,6 +25,8 @@ const MyLearningPlansPage = () => {
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [planToDelete, setPlanToDelete] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [planToShare, setPlanToShare] = useState(null);
 
   useEffect(() => {
     setUserId(currentUser.id);
@@ -44,19 +47,7 @@ const MyLearningPlansPage = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(`http://localhost:8080/api/user-learning-plans/current-owner/${userId}`);
-      const transformedPlans = response.data.map(plan => ({
-        id: plan.id,
-        planName: plan.planName,
-        description: plan.description,
-        skills: plan.skills,
-        duration: plan.duration,
-        imageUrl: plan.imageUrl,
-        visibility: plan.visibility || 'PRIVATE',
-        milestone1: plan.milestone1 || 'incomplete',
-        milestone2: plan.milestone2 || 'incomplete',
-        milestone3: plan.milestone3 || 'incomplete'
-      }));
-      setMyLearningPlans(transformedPlans);
+      setMyLearningPlans(response.data);
     } catch (error) {
       console.error('Error fetching learning plans:', error);
       showAlert('Failed to load learning plans', 'error');
@@ -65,16 +56,31 @@ const MyLearningPlansPage = () => {
     }
   };
 
-  const handleShare = async (planId, e) => {
-    e.stopPropagation();
-    try {
-      await axios.put(`http://localhost:8080/api/user-learning-plans/share/${planId}`);
-      showAlert('Plan shared successfully!', 'success');
-      fetchLearningPlans();
-    } catch (error) {
-      console.error('Error sharing plan:', error);
-      showAlert('Failed to share plan', 'error');
+  const handleShare = (planId) => {
+    setPlanToShare(planId);
+    setShowShareModal(true);
+  };
+
+  const confirmShare = async () => {
+    if (planToShare) {
+      try {
+        await axios.put(`http://localhost:8080/api/user-learning-plans/share/${planToShare}`, null, {
+          params: { visibility: 'PUBLIC' }
+        });
+        showAlert('Plan shared successfully!', 'success');
+        fetchLearningPlans();
+      } catch (error) {
+        console.error('Error sharing plan:', error);
+        showAlert('Failed to share plan', 'error');
+      }
     }
+    setShowShareModal(false);
+    setPlanToShare(null);
+  };
+
+  const cancelShare = () => {
+    setShowShareModal(false);
+    setPlanToShare(null);
   };
 
   const fetchPlanDetails = async (planId) => {
@@ -144,6 +150,58 @@ const MyLearningPlansPage = () => {
       [name]: value
     });
   };
+  const validateEditForm = () => {
+    const errors = [];
+
+    if (!editFormData.planName.trim()) errors.push('Plan name is required.');
+    if (!editFormData.description.trim()) errors.push('Description is required.');
+    if (!editFormData.skills.trim()) errors.push('Skills are required.');
+    if (!editFormData.duration.trim()) errors.push('Duration is required.');
+
+    // if (
+    //   editFormData.imageUrl &&
+    //   !/^https:\/\/imagedelivery\.net\/[a-zA-Z0-9\-]+\/[a-zA-Z0-9\-]+\/dirEntryThumbnail$/.test(editFormData.imageUrl)
+    // ) {
+    //   errors.push('Image URL must be in the format: https://imagedelivery.net/.../.../dirEntryThumbnail');
+    // }
+    return errors;
+  };
+
+  const handleUpdate = async (planId, e) => {
+    e.stopPropagation();
+
+    const errors = validateEditForm();
+    if (errors.length > 0) {
+      showAlert(errors.join(' '), 'error');
+      return;
+    }
+
+    try {
+      // Trim the imageUrl before sending
+      const dataToSend = {
+        ...editFormData,
+        imageUrl: editFormData.imageUrl?.trim() || ''
+      };
+      
+      console.log('Sending update request with data:', dataToSend);
+      const response = await axios.put(`http://localhost:8080/api/user-learning-plans/${planId}`, dataToSend);
+      setEditingPlan(null);
+      showAlert('Plan updated successfully!', 'success');
+      fetchLearningPlans();
+    } catch (error) {
+      console.error('Error updating learning plan:', error);
+      if (error.response?.data) {
+        const validationErrors = error.response.data;
+        console.log('Validation errors:', validationErrors);
+        const errorMessages = Object.entries(validationErrors)
+          .map(([field, message]) => `${field}: ${message}`)
+          .join('\n');
+        showAlert(errorMessages, 'error');
+      } else {
+        showAlert('Failed to update plan', 'error');
+      }
+    }
+  };
 
   const handleMilestoneToggle = (milestoneField) => {
     setEditFormData({
@@ -152,18 +210,18 @@ const MyLearningPlansPage = () => {
     });
   };
 
-  const handleUpdate = async (planId, e) => {
-    e.stopPropagation();
-    try {
-      await axios.put(`http://localhost:8080/api/user-learning-plans/${planId}`, editFormData);
-      setEditingPlan(null);
-      showAlert('Plan updated successfully!', 'success');
-      fetchLearningPlans();
-    } catch (error) {
-      console.error('Error updating learning plan:', error);
-      showAlert('Failed to update plan', 'error');
-    }
-  };
+  // const handleUpdate = async (planId, e) => {
+  //   e.stopPropagation();
+  //   try {
+  //     await axios.put(`http://localhost:8080/api/user-learning-plans/${planId}`, editFormData);
+  //     setEditingPlan(null);
+  //     showAlert('Plan updated successfully!', 'success');
+  //     fetchLearningPlans();
+  //   } catch (error) {
+  //     console.error('Error updating learning plan:', error);
+  //     showAlert('Failed to update plan', 'error');
+  //   }
+  // };
 
   const handleCancelEdit = (e) => {
     e.stopPropagation();
@@ -212,6 +270,25 @@ const MyLearningPlansPage = () => {
         </div>
       )}
 
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="share-modal-overlay">
+          <div className="share-modal">
+            <h3>Share Learning Plan</h3>
+            <p>Are you sure you want to share this plan publicly?</p>
+            <div className="share-modal-buttons">
+              <button onClick={cancelShare} className="cancel-share-btn">
+                Cancel
+              </button>
+              <button onClick={confirmShare} className="confirm-share-btn">
+                Share
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* My Learning Plans Section */}
       <div className="my-learning-plans">
         <h2>My Learning Plans</h2>
         {isLoading ? (
@@ -235,38 +312,48 @@ const MyLearningPlansPage = () => {
                 <div className="plan-content">
                   {editingPlan === plan.id ? (
                     <div className="edit-form" onClick={(e) => e.stopPropagation()}>
+                      <label>plan Name</label>
                       <input
                         type="text"
                         name="planName"
                         value={editFormData.planName}
                         onChange={handleEditChange}
-                        className="edit-input"
+                        placeholder="Plan Name"
+                        className={`edit-input ${!editFormData.planName.trim() ? 'input-error' : ''}`}
                       />
+                      <label>Description</label>
                       <textarea
                         name="description"
                         value={editFormData.description}
                         onChange={handleEditChange}
-                        className="edit-textarea"
+                        placeholder="Description"
+                        className={`edit-input ${!editFormData.description.trim() ? 'input-error' : ''}`}
                       />
+                      <label>skills</label>
                       <input
                         type="text"
                         name="skills"
                         value={editFormData.skills}
                         onChange={handleEditChange}
-                        className="edit-input"
+                        placeholder="Skills"
+                        className={`edit-input ${!editFormData.skills.trim() ? 'input-error' : ''}`}
                       />
+                      <label>Duration</label>
                       <input
                         type="text"
                         name="duration"
                         value={editFormData.duration}
                         onChange={handleEditChange}
-                        className="edit-input"
+                        placeholder="Duration"
+                        className={`edit-input ${!editFormData.duration.trim() ? 'input-error' : ''}`}
                       />
+                      <label>ImageUrl</label>
                       <input
                         type="text"
                         name="imageUrl"
                         value={editFormData.imageUrl}
                         onChange={handleEditChange}
+                        placeholder="Image URL"
                         className="edit-input"
                       />
                       
@@ -354,7 +441,7 @@ const MyLearningPlansPage = () => {
                           Delete
                         </button>
                         <button 
-                          onClick={(e) => handleShare(plan.id, e)} 
+                          onClick={(e) => handleShare(plan.id)} 
                           className="share-btn"
                           disabled={plan.visibility === 'PUBLIC'}
                         >

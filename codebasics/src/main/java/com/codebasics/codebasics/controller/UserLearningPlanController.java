@@ -3,10 +3,14 @@ package com.codebasics.codebasics.controller;
 import com.codebasics.codebasics.model.UserLearningPlan;
 import com.codebasics.codebasics.dto.UserLearningPlanDto;
 import com.codebasics.codebasics.service.UserLearningPlanService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 //@CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -58,9 +62,23 @@ public class UserLearningPlanController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserLearningPlan> updatePlan(@PathVariable Long id, @RequestBody UserLearningPlan plan) {
-        UserLearningPlan updatedPlan = userLearningPlanService.updatePlan(id, plan);
-        return ResponseEntity.ok(updatedPlan);
+    public ResponseEntity<?> updatePlan(@PathVariable Long id, @Valid @RequestBody UserLearningPlan plan,
+            BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(
+                            fieldError -> fieldError.getField(),
+                            fieldError -> fieldError.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        try {
+            UserLearningPlan updatedPlan = userLearningPlanService.updatePlan(id, plan);
+            return ResponseEntity.ok(updatedPlan);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -84,9 +102,23 @@ public class UserLearningPlanController {
         return userLearningPlanService.getPlansByVisibility(visibility);
     }
 
+    @GetMapping("/current-owner/{currentOwnerId}/visibility/{visibility}")
+    public List<UserLearningPlan> getPlansByCurrentOwnerAndVisibility(
+            @PathVariable Long currentOwnerId,
+            @PathVariable String visibility) {
+        return userLearningPlanService.getPlansByCurrentOwnerAndVisibility(currentOwnerId, visibility);
+    }
+
     @PutMapping("/share/{id}")
-    public ResponseEntity<UserLearningPlan> sharePlan(@PathVariable Long id) {
-        UserLearningPlan updatedPlan = userLearningPlanService.updateVisibility(id, "PUBLIC");
-        return ResponseEntity.ok(updatedPlan);
- }
+    public ResponseEntity<UserLearningPlan> sharePlan(
+            @PathVariable Long id,
+            @RequestParam String visibility,
+            @RequestParam(required = false) Long recipientId) {
+        try {
+            UserLearningPlan updatedPlan = userLearningPlanService.updateVisibility(id, visibility);
+            return ResponseEntity.ok(updatedPlan);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

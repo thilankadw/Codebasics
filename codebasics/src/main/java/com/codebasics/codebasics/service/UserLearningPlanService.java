@@ -32,18 +32,19 @@ public class UserLearningPlanService {
     public UserLearningPlan subscribeToPlan(Long planId, Long userId) {
         LearningPlan originalPlan = learningPlanRepository.findById(planId)
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
-        
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        
+
         User originalOwner = originalPlan.getOwnerId();
-        
+
         UserLearningPlan userPlan = new UserLearningPlan();
         userPlan.setPlanName(originalPlan.getPlanName());
         userPlan.setDescription(originalPlan.getDescription());
         userPlan.setSkills(originalPlan.getSkills());
         userPlan.setDuration(originalPlan.getDuration());
-        userPlan.setImageUrl(originalPlan.getImageUrl());
+        String imageUrl = originalPlan.getImageUrl();
+        userPlan.setImageUrl(imageUrl != null && !imageUrl.trim().isEmpty() ? imageUrl.trim() : null);
         userPlan.setActualOwner(originalOwner);
         userPlan.setCurrentOwner(user);
         userPlan.setVisibility("PRIVATE");
@@ -51,14 +52,26 @@ public class UserLearningPlanService {
         userPlan.setMilestone1("incomplete");
         userPlan.setMilestone2("incomplete");
         userPlan.setMilestone3("incomplete");
-        
+
         return userLearningPlanRepository.save(userPlan);
     }
 
     public UserLearningPlan updatePlan(Long id, UserLearningPlan planDetails) {
         UserLearningPlan plan = userLearningPlanRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Plan not found with id: " + id));
-        
+
+        // Validate milestone statuses
+        if (!isValidMilestoneStatus(planDetails.getMilestone1()) ||
+                !isValidMilestoneStatus(planDetails.getMilestone2()) ||
+                !isValidMilestoneStatus(planDetails.getMilestone3())) {
+            throw new RuntimeException("Invalid milestone status. Must be either 'complete' or 'incomplete'");
+        }
+
+        // Validate visibility
+        if (!isValidVisibility(planDetails.getVisibility())) {
+            throw new RuntimeException("Invalid visibility. Must be either 'PRIVATE' or 'PUBLIC'");
+        }
+
         plan.setPlanName(planDetails.getPlanName());
         plan.setDescription(planDetails.getDescription());
         plan.setSkills(planDetails.getSkills());
@@ -68,8 +81,16 @@ public class UserLearningPlanService {
         plan.setMilestone1(planDetails.getMilestone1());
         plan.setMilestone2(planDetails.getMilestone2());
         plan.setMilestone3(planDetails.getMilestone3());
-        
+
         return userLearningPlanRepository.save(plan);
+    }
+
+    private boolean isValidMilestoneStatus(String status) {
+        return status != null && (status.equals("complete") || status.equals("incomplete"));
+    }
+
+    private boolean isValidVisibility(String visibility) {
+        return visibility != null && (visibility.equals("PRIVATE") || visibility.equals("PUBLIC"));
     }
 
     public void deletePlan(Long id) {
@@ -91,9 +112,33 @@ public class UserLearningPlanService {
 
     public UserLearningPlan updateVisibility(Long id, String visibility) {
         UserLearningPlan plan = userLearningPlanRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Plan not found with id: " + id));
-        
+                .orElseThrow(() -> new RuntimeException("Plan not found with id: " + id));
+
+        // If changing to PRIVATE, create a new copy for the recipient
+        if (visibility.equals("PRIVATE")) {
+            UserLearningPlan newPlan = new UserLearningPlan();
+            newPlan.setPlanName(plan.getPlanName());
+            newPlan.setDescription(plan.getDescription());
+            newPlan.setSkills(plan.getSkills());
+            newPlan.setDuration(plan.getDuration());
+            newPlan.setImageUrl(plan.getImageUrl());
+            newPlan.setActualOwner(plan.getActualOwner());
+            newPlan.setCurrentOwner(plan.getCurrentOwner());
+            newPlan.setVisibility(visibility);
+            newPlan.setOriginalPlanId(plan.getOriginalPlanId());
+            newPlan.setMilestone1(plan.getMilestone1());
+            newPlan.setMilestone2(plan.getMilestone2());
+            newPlan.setMilestone3(plan.getMilestone3());
+
+            return userLearningPlanRepository.save(newPlan);
+        }
+
+        // For PUBLIC visibility, just update the existing plan
         plan.setVisibility(visibility);
         return userLearningPlanRepository.save(plan);
+    }
+
+    public List<UserLearningPlan> getPlansByCurrentOwnerAndVisibility(Long currentOwnerId, String visibility) {
+        return userLearningPlanRepository.findByCurrentOwnerIdAndVisibility(currentOwnerId, visibility);
     }
 }
