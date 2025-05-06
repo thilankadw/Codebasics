@@ -37,8 +37,8 @@ public class PostInteractionService {
         // Handle COMMENT
         if (postInteractionDTO.getType() == InteractionType.COMMENT) {
             if (postInteractionDTO.getContent() == null || postInteractionDTO.getContent().isEmpty()) {
-                throw new RuntimeException("Content is required for comment type");
-            }
+                throw new RuntimeException("Comment type is required.");
+
         }
 
         // Handle REACTION: only allow one like per user per post
