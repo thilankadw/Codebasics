@@ -11,7 +11,6 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "api/learning-plan")
 public class LearningPlanController {
-
     @Autowired
     private LearningPlanService learningPlanService;
 
@@ -22,7 +21,7 @@ public class LearningPlanController {
 
     @GetMapping("/all-learning-plans")
     public ResponseEntity<List<LearningPlanDTO>> getAllLearningPlans(){
-        return ResponseEntity.ok(learningPlanService.getAlLearningPlans());
+        return ResponseEntity.ok(learningPlanService.getAllLearningPlans());
     }
 
     @PutMapping("/update-learning-plan/{id}")
@@ -33,5 +32,10 @@ public class LearningPlanController {
     @DeleteMapping("/delete-learning-plan/{id}")
     public ResponseEntity<LearningPlanDTO> deleteLearningPlan(@PathVariable Long id) {
         return ResponseEntity.ok(learningPlanService.deleteLearningPlan(id));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<LearningPlanDTO> getLearningPlanById(@PathVariable Long id) {
+        return ResponseEntity.ok(learningPlanService.getLearningPlanWithPhases(id));
     }
 }

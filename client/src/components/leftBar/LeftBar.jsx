@@ -5,6 +5,12 @@ import { Link } from "react-router-dom";
 import LearningPlan from "../../assets/learningplan.png";
 import NewPlan from "../../assets/newplan.png";
 import SubscribePlan from "../../assets/subscribeplan.png";
+import { AuthContext } from "../../context/authContext";
+import { useContext } from "react";
+import { Link } from "react-router-dom";
+import LearningPlan from "../../assets/learningplan.png";
+import NewPlan from "../../assets/newplan.png";
+import SubscribePlan from "../../assets/subscribeplan.png";
 import ResharedPlan from "../../assets/resharedplan.png";
 // import PrivatePlan from "../../assets/privateplan.png";
 
@@ -33,21 +39,6 @@ const LeftBar = () => {
               <span>Subscribed Learning Plans</span>
             </div>
           </Link>
-
-            {/* ✅ New Reshared Plans Link */}
-            <Link to="/learning-plans" style={{ textDecoration: "none", color: "#000" }}>
-            <div className="item">
-              <img src={ResharedPlan} alt="Reshared Plan" />
-              <span>Reshared Plans</span>
-            </div>
-          </Link>
-
-          {/* <Link to="/privateplans" style={{ textDecoration: "none", color: "#000" }}>
-            <div className="item">
-              <img src={PrivatePlan} alt="Private Plan" />
-              <span>Privately Shared Plans</span>
-            </div>
-          </Link> */}
         </div>
       </div>
     </div>

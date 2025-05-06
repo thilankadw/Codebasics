@@ -1,5 +1,7 @@
 package com.codebasics.codebasics.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -57,10 +59,13 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "follower_id"),
             inverseJoinColumns = @JoinColumn(name = "following_id")
     )
+    @JsonManagedReference
     private Set<User> following = new HashSet<>();
 
     @ManyToMany(mappedBy = "following")
+    @JsonBackReference
     private Set<User> followers = new HashSet<>();
+
 
 
     @Column(name = "cover_pic")
