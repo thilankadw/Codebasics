@@ -27,14 +27,14 @@ h2 {
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  /* transition: all 0.3s ease; */
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
 .plan-card:hover {
-  transform: translateY(-5px);
+  /* transform: translateY(-5px); */
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
@@ -59,7 +59,7 @@ h2 {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  /* flex-grow: 1; */
 }
 
 .plan-title {
@@ -93,7 +93,7 @@ h2 {
   font-size: 14px;
   line-height: 1.5;
   margin: 0;
-  flex-grow: 1;
+  
 }
 
 .loading-spinner, .no-plans-message {
@@ -340,12 +340,12 @@ color: #666;
 
 /* Make cards clickable */
 .plan-card {
-cursor: pointer;
-transition: transform 0.2s, box-shadow 0.2s;
+/* cursor: pointer;
+transition: transform 0.2s, box-shadow 0.2s; */
 }
 
 .plan-card:hover {
-transform: translateY(-5px);
+/* transform: translateY(-5px); */
 box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 /* Add these styles for the share button */
@@ -423,11 +423,11 @@ margin-top: 20px;
 border: 1px solid #e0e0e0;
 border-radius: 8px;
 overflow: hidden;
-transition: transform 0.2s, box-shadow 0.2s;
+/* transition: transform 0.2s, box-shadow 0.2s; */
 }
 
 .plan-card:hover {
-transform: translateY(-5px);
+/* transform: translateY(-5px); */
 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
