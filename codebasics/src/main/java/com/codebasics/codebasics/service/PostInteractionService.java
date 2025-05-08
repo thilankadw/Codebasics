@@ -29,7 +29,7 @@ public class PostInteractionService {
     public PostInteractionDTO createPostInteraction(PostInteractionDTO postInteractionDTO) {
         Optional<Post> postOpt = Optional.ofNullable(postService.getPostById(postInteractionDTO.getPostId()));
         if (!postOpt.isPresent()) {
-            throw new RuntimeException("Post not found");
+            throw new RuntimeException("Post is not found");
         }
 
         Post post = postOpt.get();
@@ -37,7 +37,7 @@ public class PostInteractionService {
         // Handle COMMENT
         if (postInteractionDTO.getType() == InteractionType.COMMENT) {
             if (postInteractionDTO.getContent() == null || postInteractionDTO.getContent().isEmpty()) {
-                throw new RuntimeException("Comment type is required.");
+                throw new RuntimeException("Comment type is required");
 
         }
 
