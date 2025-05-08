@@ -23,6 +23,11 @@ public class Followcontroller {
         FollowService.followUser(followerId, followingId);
         return ResponseEntity.ok("Followed!");
     }
+    @GetMapping("/{followerId}/is-following/{followingId}")
+    public ResponseEntity<Boolean> isFollowing(@PathVariable Long followerId, @PathVariable Long followingId) {
+        return ResponseEntity.ok(FollowService.isFollowing(followerId, followingId));
+    }
+
 
     @PostMapping("/{followerId}/unfollow/{followingId}")
     public ResponseEntity<?> unfollow(@PathVariable Long followerId, @PathVariable Long followingId) {
@@ -39,4 +44,10 @@ public class Followcontroller {
     public ResponseEntity<Set<User>> getFollowing(@PathVariable Long userId) {
         return ResponseEntity.ok(FollowService.getFollowing(userId));
     }
+    // In FollowController.java
+    @GetMapping("/{userId}/suggestions")
+    public ResponseEntity<Set<User>> getSuggestions(@PathVariable Long userId) {
+        return ResponseEntity.ok(FollowService.getSuggestions(userId));
+    }
+
 }

@@ -141,7 +141,7 @@ const Post = ({ post }) => {
             <CommentIcon /> See Comments
           </div>
           <div className="item">
-            <ShareIcon /> Share
+          
           </div>
         </div>
 

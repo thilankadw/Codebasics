@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class FollowService {
@@ -35,6 +36,24 @@ public class FollowService {
 
     public Set<User> getFollowing(Long userId) {
         return userRepository.findById(userId).orElseThrow().getFollowing();
+    }
+    // In FollowService.java
+    public Set<User> getSuggestions(Long userId) {
+        User currentUser = userRepository.findById(userId).orElseThrow();
+        Set<User> following = currentUser.getFollowing();
+        return userRepository.findAll().stream()
+                .filter(user -> !user.getId().equals(userId)) // exclude self
+                .filter(user -> !following.contains(user))     // exclude already followed
+                .collect(Collectors.toSet());
+    }
+    public boolean isFollowing(Long followerId, Long followingId) {
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new RuntimeException("Follower not found"));
+
+        User following = userRepository.findById(followingId)
+                .orElseThrow(() -> new RuntimeException("Following user not found"));
+
+        return follower.getFollowing().contains(following);
     }
 
 }

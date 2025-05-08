@@ -1,0 +1,96 @@
+.friends {
+    padding: 20px;
+  
+    h2 {
+      margin-bottom: 15px;
+    }
+  
+    .friend-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+  
+    .friend-wrapper {
+      margin-bottom: 12px;
+    }
+  
+    .friend {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
+      justify-content: space-between;
+  
+      &:hover {
+        background-color: #f4f4f4;
+      }
+  
+      .friend-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+  
+        img {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+  
+        span {
+          font-weight: 500;
+        }
+      }
+  
+      .friend-icon {
+        color: #555;
+      }
+  
+      .unfollow-btn {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: background 0.3s;
+  
+        &:hover {
+          background-color: #c0392b;
+        }
+      }
+    }
+    .follow-btn,
+.unfollow-btn {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.follow-btn {
+  background-color: #1da1f2;
+  color: white;
+}
+    .friend-search {
+        width: 80%;
+        padding: 8px 12px;
+        margin-bottom: 16px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+      }
+      
+  }
+  
