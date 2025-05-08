@@ -40,8 +40,7 @@ public class PostInteractionService {
                 throw new RuntimeException("Comment type is required");
 
         }
-
-        // Handle REACTION: only allow one like per user per post
+            
         if (postInteractionDTO.getType() == InteractionType.REACTION) {
             boolean alreadyLiked = postInteractionRepository.existsByUserIdAndPostIdAndType(
                     postInteractionDTO.getUserId(),
