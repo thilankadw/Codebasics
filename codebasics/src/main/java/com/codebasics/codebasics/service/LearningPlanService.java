@@ -1,7 +1,10 @@
 package com.codebasics.codebasics.service;
 
 import com.codebasics.codebasics.dto.LearningPlanDTO;
+import com.codebasics.codebasics.dto.LearningPlanPhaseDTO;
 import com.codebasics.codebasics.model.LearningPlan;
+import com.codebasics.codebasics.model.LearningPlanPhase;
+import com.codebasics.codebasics.repository.LearningPlanPhaseRepository;
 import com.codebasics.codebasics.repository.LearningPlanRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -20,17 +24,32 @@ public class LearningPlanService {
     private LearningPlanRepository learningPlanRepository;
 
     @Autowired
+    private LearningPlanPhaseRepository learningPlanPhaseRepository;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     public LearningPlanDTO createLearningPlan(LearningPlanDTO learningPlanDTO) {
         LearningPlan learningPlan = modelMapper.map(learningPlanDTO, LearningPlan.class);
-        learningPlanRepository.save(learningPlan);
-        return learningPlanDTO;
+        learningPlan = learningPlanRepository.save(learningPlan);
+
+        if (learningPlanDTO.getPhases() != null) {
+            List<LearningPlanPhase> phases = learningPlanDTO.getPhases().stream()
+                    .map(phaseDTO -> {
+                        LearningPlanPhase phase = modelMapper.map(phaseDTO, LearningPlanPhase.class);
+                        return phase;
+                    })
+                    .collect(Collectors.toList());
+            learningPlanPhaseRepository.saveAll(phases);
+        }
+        return getLearningPlanWithPhases(learningPlan.getId());
     }
 
-    public List<LearningPlanDTO> getAlLearningPlans() {
-        List<LearningPlan> learningPlansList = learningPlanRepository.findAll();
-        return modelMapper.map(learningPlansList, new TypeToken<List<LearningPlanDTO>>(){}.getType());
+    public List<LearningPlanDTO> getAllLearningPlans() {
+        List<LearningPlan> learningPlans = learningPlanRepository.findAll();
+        return learningPlans.stream()
+                .map(plan -> getLearningPlanWithPhases(plan.getId()))
+                .collect(Collectors.toList());
     }
 
     public LearningPlanDTO updateLearningPlan(Long id, LearningPlanDTO learningPlanDTO) {
@@ -41,15 +60,26 @@ public class LearningPlanService {
         }
 
         LearningPlan learningPlan = existingPlan.get();
-        learningPlan.setPlanName(learningPlanDTO.getPlanName());
-        learningPlan.setDescription(learningPlanDTO.getDescription());
-        learningPlan.setSkills(learningPlanDTO.getSkills());
-        learningPlan.setDuration(learningPlanDTO.getDuration());
-        learningPlan.setImageUrl(learningPlanDTO.getImageUrl());
-
+        modelMapper.map(learningPlanDTO, learningPlan);
         learningPlanRepository.save(learningPlan);
 
-        return modelMapper.map(learningPlan, LearningPlanDTO.class);
+        // Update phases
+        if (learningPlanDTO.getPhases() != null) {
+            // First delete existing phases
+            learningPlanPhaseRepository.deleteByLearningPlanId(id);
+
+            // Then add new ones
+            List<LearningPlanPhase> phases = learningPlanDTO.getPhases().stream()
+                    .map(phaseDTO -> {
+                        LearningPlanPhase phase = modelMapper.map(phaseDTO, LearningPlanPhase.class);
+                        return phase;
+                    })
+                    .collect(Collectors.toList());
+
+            learningPlanPhaseRepository.saveAll(phases);
+        }
+
+        return getLearningPlanWithPhases(id);
     }
 
     public LearningPlanDTO deleteLearningPlan(Long id) {
@@ -64,5 +94,17 @@ public class LearningPlanService {
         learningPlanRepository.deleteById(id);
 
         return modelMapper.map(learningPlan, LearningPlanDTO.class);
+    }
+
+    public LearningPlanDTO getLearningPlanWithPhases(Long id) {
+        LearningPlan learningPlan = learningPlanRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Learning Plan not found"));
+
+        List<LearningPlanPhase> phases = learningPlanPhaseRepository.findByLearningPlanId(id);
+
+        LearningPlanDTO dto = modelMapper.map(learningPlan, LearningPlanDTO.class);
+        dto.setPhases(modelMapper.map(phases, new TypeToken<List<LearningPlanPhaseDTO>>(){}.getType()));
+
+        return dto;
     }
 }

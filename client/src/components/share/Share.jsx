@@ -2,9 +2,10 @@ import "./share.scss";
 import Image from "../../assets/img.png";
 import Map from "../../assets/map.png";
 import Friend from "../../assets/friend.png";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import CreatePost from "../createPost/createPost";
+import axios from "axios";
 
 const Share = () => {
   const { currentUser } = useContext(AuthContext);
@@ -14,20 +15,31 @@ const Share = () => {
     setOpenCreatePost(true);
   };
 
+  const [user, setUser] = useState(null);
+  const userId = parseInt(currentUser.id);
+
+  useEffect(() => {
+      const fetchUser = async () => {
+        try {
+          const res = await axios.get(`http://localhost:8080/api/auth/users/${userId}`);
+          setUser(res.data);
+        } catch (err) {
+          console.error("Error fetching user:", err);
+        }
+      };
+      fetchUser();
+    }, [userId]);
+
   return (
     <div className="share">
       <div className="container">
         <div className="top" onClick={handleOpenCreatePost} style={{ cursor: "pointer" }}>
           <div className="left">
-            <img src={"/upload/" + currentUser.profilePic} alt="profile" />
+            <img src={user?.profilePic ? `http://localhost:8080/uploads/${user.profilePic}` : "/defaultCover.jpg"} />
             <input
               type="text"
               placeholder={`What's on your mind, ${currentUser.name}?`}
-              disabled
             />
-          </div>
-          <div className="right">
-            {/* You could optionally show a preview here */}
           </div>
         </div>
 
@@ -41,9 +53,9 @@ const Share = () => {
             </div>
            
           </div>
-          <div className="right">
+          {/* <div className="right">
             <button onClick={handleOpenCreatePost}>Share</button>
-          </div>
+          </div> */}
         </div>
       </div>
 

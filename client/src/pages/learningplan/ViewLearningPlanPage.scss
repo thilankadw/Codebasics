@@ -1,0 +1,82 @@
+@use '../../styles/variables' as vars;
+@use '../../styles/mixins' as mix;
+@use '../../styles/themes' as th;
+
+
+.view-learning-plan-page {
+  padding: 40px;
+  background-color: themed('bg');
+  color: themed('textColor');
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+
+  .plan-meta {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+    font-weight: 500;
+    color: themed('textColorSoft');
+  }
+
+  .plan-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 20px 0;
+  }
+
+  .phases-list {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .phase-card {
+      background-color: themed('phaseCardBg');
+      border: 1px solid themed('cardBorder');
+      padding: 20px;
+      border-radius: 12px;
+
+      h3 {
+        margin-bottom: 10px;
+        color: themed('primary');
+      }
+
+      .phase-meta {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: themed('textColorSoft');
+      }
+
+      .resources {
+        background-color: themed('resourcesBg');
+        padding: 10px;
+        margin-top: 15px;
+        border-radius: 8px;
+
+        h4 {
+          margin-bottom: 5px;
+          color: themed('info');
+        }
+      }
+    }
+  }
+
+  .actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+
+  }
+}

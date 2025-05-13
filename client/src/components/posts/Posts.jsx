@@ -1,25 +1,27 @@
 import "./posts.scss";
 import Post from "../post/Post";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { AuthContext } from "../../context/authContext";
 
 const Posts = ({ userId }) => {
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         let res;
         if (userId) {
-          res = await axios.get(`http://localhost:8080/api/posts/user/${userId}`);
+          res = await axios.get(`http://localhost:8080/api/posts/user/${currentUser.id}`);
         } else {
           res = await axios.get(`http://localhost:8080/api/posts`);
         }
         setPosts(res.data);
-        setFilteredPosts(res.data); // initialize filtered posts
+        setFilteredPosts(res.data); 
         console.log(res.data);
       } catch (err) {
         console.error("Failed to fetch posts:", err);
@@ -59,16 +61,6 @@ const Posts = ({ userId }) => {
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
   }}
 >
-  <h2
-    style={{
-      fontSize: "32px",
-      fontWeight: "700",
-      marginBottom: "20px",
-      color: "#333",
-    }}
-  >
-    My Posts
-  </h2>
   <input
     type="text"
     placeholder="Search posts..."
