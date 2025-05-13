@@ -16,12 +16,16 @@ const LeftBar = () => {
       <div className="container">
         <div className="menu">
           <div className="user">
-            <img src={"/upload/" + currentUser.profilePic} alt="User" />
+            <img src={`http://localhost:8080/uploads/${currentUser.profilePic}`} alt="User" />
             <span>{currentUser.name}</span>
           </div>
           <div className="item">
-            <img src="" alt="Friends" />
-            <span>Friends</span>
+          <Link to="/friends" style={{ textDecoration: "none", color: "#000" }}>
+  <div className="item">
+    <img src="" alt="Friends" />
+    <span>Friends</span>
+  </div>
+</Link>
           </div>
         </div>
         <hr />

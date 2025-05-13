@@ -18,6 +18,7 @@ import ViewAllLearningPlansPage from "./pages/learningplan/ViewAllLearningPlansP
 import { ToastContainer, toast } from 'react-toastify';
 import RightBar from "./components/rightBar/RightBar";
 import "./style.scss";
+import Friends from "./components/Friends/Friends";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -69,6 +70,10 @@ function App() {
         {
           path: "/learning-plans",
           element: <LearningPlanHome />,
+        },
+        {
+          path: "/friends",
+          element: <Friends/>,
         },
         {
           path: "/mylearning-plans",

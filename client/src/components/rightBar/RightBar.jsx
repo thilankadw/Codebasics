@@ -1,8 +1,8 @@
 import "./rightBar.scss";
 import axios from "axios";
-
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
+import { Link } from "react-router-dom";
 
 const RightBar = ({ currentUserId }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -12,38 +12,51 @@ const RightBar = ({ currentUserId }) => {
 
   useEffect(() => {
     // Fetch suggestions
-    axios.get(`http://localhost:8080/api/users/${currentUser.id}/suggestions`)
-      .then(res => setSuggestions(res.data))
-      .catch(err => console.error("Error fetching suggestions:", err));
+    axios
+      .get(`http://localhost:8080/api/users/${currentUser.id}/suggestions`)
+      .then((res) => setSuggestions(res.data))
+      .catch((err) => console.error("Error fetching suggestions:", err));
 
     // Fetch online friends (currently treated same as following)
-    axios.get(`http://localhost:8080/api/users/${currentUser.id}/following`)
-      .then(res => {
+    axios
+      .get(`http://localhost:8080/api/users/${currentUser.id}/following`)
+      .then((res) => {
         setOnlineFriends(res.data);
-        setFriendList(res.data); // friend list = following
+        setFriendList(res.data);
       })
-      .catch(err => console.error("Error fetching following:", err));
-  }, [currentUserId]);
+      .catch((err) => console.error("Error fetching following:", err));
+  }, [currentUser.id]);
 
   const handleFollow = (userIdToFollow) => {
-    axios.post(`http://localhost:8080/api/users/${currentUser.id}/follow/${userIdToFollow}`)
+    axios
+      .post(
+        `http://localhost:8080/api/users/${currentUser.id}/follow/${userIdToFollow}`
+      )
       .then(() => {
-        // Remove from suggestions and add to friend list
-        const followedUser = suggestions.find(u => u.id === userIdToFollow);
-        setSuggestions(prev => prev.filter(u => u.id !== userIdToFollow));
-        if (followedUser) setFriendList(prev => [...prev, followedUser]);
+        const followedUser = suggestions.find((u) => u.id === userIdToFollow);
+        setSuggestions((prev) =>
+          prev.filter((u) => u.id !== userIdToFollow)
+        );
+        if (followedUser)
+          setFriendList((prev) => [...prev, followedUser]);
       })
-      .catch(err => console.error("Error following user:", err));
+      .catch((err) => console.error("Error following user:", err));
   };
 
   const handleUnfollow = (userIdToUnfollow) => {
-    axios.post(`http://localhost:8080/api/users/${currentUser.id}/unfollow/${userIdToUnfollow}`)
+    axios
+      .post(
+        `http://localhost:8080/api/users/${currentUser.id}/unfollow/${userIdToUnfollow}`
+      )
       .then(() => {
-        // Remove from friend list
-        setFriendList(prev => prev.filter(u => u.id !== userIdToUnfollow));
-        setOnlineFriends(prev => prev.filter(u => u.id !== userIdToUnfollow));
+        setFriendList((prev) =>
+          prev.filter((u) => u.id !== userIdToUnfollow)
+        );
+        setOnlineFriends((prev) =>
+          prev.filter((u) => u.id !== userIdToUnfollow)
+        );
       })
-      .catch(err => console.error("Error unfollowing user:", err));
+      .catch((err) => console.error("Error unfollowing user:", err));
   };
 
   return (
@@ -56,12 +69,32 @@ const RightBar = ({ currentUserId }) => {
           {suggestions.map((user) => (
             <div className="user" key={user.id}>
               <div className="userInfo">
-                <img src={user.profilePic || "https://via.placeholder.com/50"} alt="User" />
-                <span>{user.name}</span>
+                <Link
+                  to={`/profile/${user.id}`}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <img
+                    src={
+                      user.profilePic
+                        ? `http://localhost:8080/uploads/${user.profilePic}`
+                        : "https://via.placeholder.com/50"
+                    }
+                    alt=""
+                  />
+                  <span>{user.name}</span>
+                </Link>
               </div>
               <div className="buttons">
                 <button onClick={() => handleFollow(user.id)}>Follow</button>
-                <button onClick={() => setSuggestions(prev => prev.filter(u => u.id !== user.id))}>Dismiss</button>
+                <button
+                  onClick={() =>
+                    setSuggestions((prev) =>
+                      prev.filter((u) => u.id !== user.id)
+                    )
+                  }
+                >
+                  Dismiss
+                </button>
               </div>
             </div>
           ))}
@@ -73,9 +106,27 @@ const RightBar = ({ currentUserId }) => {
           {onlineFriends.map((user) => (
             <div className="user" key={user.id}>
               <div className="userInfo">
-                <img src={user.profilePic || "https://via.placeholder.com/50"} alt="User" />
-                <div className="online" />
-                <span>{user.name}</span>
+                <Link
+                  to={`/profile/${user.id}`}
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <img
+                    src={
+                      user.profilePic
+                        ? `http://localhost:8080/uploads/${user.profilePic}`
+                        : "https://via.placeholder.com/50"
+                    }
+                    alt=""
+                  />
+                  <div className="online" />
+                  <span>{user.name}</span>
+                </Link>
               </div>
             </div>
           ))}
@@ -87,8 +138,20 @@ const RightBar = ({ currentUserId }) => {
           {friendList.map((user) => (
             <div className="user" key={user.id}>
               <div className="userInfo">
-                <img src={`http://localhost:8080/uploads/${user.profilePic}` || "https://via.placeholder.com/50"} alt="Friend" />
-                <span>{user.name}</span>
+                <Link
+                  to={`/profile/${user.id}`}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <img
+                    src={
+                      user.profilePic
+                        ? `http://localhost:8080/uploads/${user.profilePic}`
+                        : "https://via.placeholder.com/50"
+                    }
+                    alt=""
+                  />
+                  <span>{user.name}</span>
+                </Link>
               </div>
               <div className="buttons">
                 <button onClick={() => handleUnfollow(user.id)}>Unfollow</button>

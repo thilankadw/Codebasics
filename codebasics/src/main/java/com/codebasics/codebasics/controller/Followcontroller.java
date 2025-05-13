@@ -23,6 +23,11 @@ public class Followcontroller {
         FollowService.followUser(followerId, followingId);
         return ResponseEntity.ok("Followed!");
     }
+    @GetMapping("/{followerId}/is-following/{followingId}")
+    public ResponseEntity<Boolean> isFollowing(@PathVariable Long followerId, @PathVariable Long followingId) {
+        return ResponseEntity.ok(FollowService.isFollowing(followerId, followingId));
+    }
+
 
     @PostMapping("/{followerId}/unfollow/{followingId}")
     public ResponseEntity<?> unfollow(@PathVariable Long followerId, @PathVariable Long followingId) {
