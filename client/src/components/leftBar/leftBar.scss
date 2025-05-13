@@ -2,7 +2,7 @@
 
 .leftBar {
   @include themify($themes) {
-    flex: 2;
+    flex: 1.5;
     position: sticky;
     top: 70px;
     height: calc(100vh - 70px);
@@ -43,14 +43,15 @@
           gap: 10px;
 
           img {
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             object-fit: cover;
           }
 
           span {
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: 700;
           }
         }
 
@@ -58,6 +59,7 @@
           display: flex;
           align-items: center;
           gap: 10px;
+          margin-left: 10px;
 
           img {
             width: 30px;

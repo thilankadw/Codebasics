@@ -1,0 +1,75 @@
+@import './themes';
+
+@mixin themify($themes) {
+    @each $theme, $map in $themes {
+      .theme-#{$theme} & {
+        $theme-map: $map !global;
+        @content;
+        $theme-map: null !global;
+      }
+    }
+  }
+  
+  @function themed($key) {
+    @if ($theme-map == null) {
+      @error "$theme-map is null. Make sure to use themed() inside themify() mixin";
+    }
+    @return map-get($theme-map, $key);
+  }
+  
+  @mixin button($type: primary) {
+    @include themify($themes) {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 64px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+  
+      @if $type == primary {
+        background-color: themed('primary');
+        color: white;
+  
+        &:hover {
+          background-color: themed('primaryHover');
+        }
+      } @else if $type == danger {
+        background-color: themed('danger');
+        color: white;
+  
+        &:hover {
+          background-color: themed('dangerHover');
+        }
+      } @else if $type == info {
+        background-color: themed('info');
+        color: white;
+  
+        &:hover {
+          background-color: themed('infoHover');
+        }
+      } @else if $type == submit {
+        background-color: themed('logo');
+        color: white;
+        font-size: 20px;
+        padding: 8px 72px;
+  
+        &:hover {
+          background-color: themed('infoHover');
+        }
+      } @else if $type == textbtn {
+        background-color: themed('bg');
+        color: themed('primary');
+        font-weight: 600;
+        
+        &:hover {
+          background-color: themed('infoHover');
+        }
+      }
+    }
+  }
+
+  @mixin tablet {
+    @media (max-width: 768px) {
+      @content;
+    }
+  }

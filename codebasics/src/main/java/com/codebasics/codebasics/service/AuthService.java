@@ -51,28 +51,22 @@ public class AuthService {
         user.setEmail(registerDTO.getEmail());
         user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
         user.setName(registerDTO.getName());
-
-
-
+        user.setProvider("local");
         userRepository.save(user);
 
         return "User registered successfully!";
     }
 
     public AuthResponseDTO login(LoginDTO loginDTO) {
-        // Authenticate user
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword())
         );
 
-        // Fetch user details
         User user = userRepository.findByUsername(loginDTO.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Generate JWT token
         String token = jwtUtil.generateToken(user.getUsername());
 
-        // Build response with token + user info
         AuthResponseDTO response = new AuthResponseDTO();
         response.setToken(token);
         response.setId(user.getId());
@@ -87,37 +81,31 @@ public class AuthService {
         return response;
     }
 
-    // ✅ Get all users
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    // ✅ Get user by ID
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
     }
 
-    // ✅ Update user with file support
     public User updateUser(Long id, RegisterDTO registerDTO, MultipartFile profilePic, MultipartFile coverPic) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
 
-        // Update fields
         existingUser.setUsername(registerDTO.getUsername());
         existingUser.setEmail(registerDTO.getEmail());
-        existingUser.setPassword(existingUser.getPassword()); // encode updated password
+        existingUser.setPassword(existingUser.getPassword());
         existingUser.setName(registerDTO.getName());
         existingUser.setWebsite(registerDTO.getWebsite());
         existingUser.setCity(registerDTO.getCity());
 
-        // Update profilePic if provided
         if (profilePic != null && !profilePic.isEmpty()) {
             String profilePicPath = saveFile(profilePic);
             existingUser.setProfilePic(profilePicPath);
         }
 
-        // Update coverPic if provided
         if (coverPic != null && !coverPic.isEmpty()) {
             String coverPicPath = saveFile(coverPic);
             existingUser.setCoverPic(coverPicPath);
@@ -133,7 +121,6 @@ public class AuthService {
         userRepository.delete(existingUser);
     }
 
-    // Save file to local uploads/ folder and return the path
     private String saveFile(MultipartFile file) {
         try {
             File uploadDir = new File(UPLOAD_DIR);
@@ -148,7 +135,7 @@ public class AuthService {
             Path filePath = Paths.get(UPLOAD_DIR + uniqueFilename);
             Files.write(filePath, file.getBytes());
 
-            return uniqueFilename; // ✅ return only filename
+            return uniqueFilename;
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file: " + e.getMessage());
         }

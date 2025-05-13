@@ -2,6 +2,8 @@ package com.codebasics.codebasics.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,6 +15,15 @@ public class LearningPlanDTO {
     private String duration;
     private String imageUrl;
     private Long ownerId;
+    private List<LearningPlanPhaseDTO> phases;
+
+    public List<LearningPlanPhaseDTO> getPhases() {
+        return phases;
+    }
+
+    public void setPhases(List<LearningPlanPhaseDTO> phases) {
+        this.phases = phases;
+    }
 
     public void setId(Long id) {
         this.id = id;

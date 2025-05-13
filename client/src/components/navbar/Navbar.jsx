@@ -1,51 +1,49 @@
 import "./navbar.scss";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
-import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import { DarkModeContext } from "../../context/darkModeContext";
+import Logo from '../../assets/logo.png';
+import axios from "axios";
 
 const Navbar = () => {
   const { currentUser } = useContext(AuthContext);
-  const { darkMode, toggle } = useContext(DarkModeContext);
+  const [user, setUser] = useState(null);
+  const userId = parseInt(currentUser.id);
 
-  console.log(currentUser);
+  useEffect(() => {
+      const fetchUser = async () => {
+        try {
+          const res = await axios.get(`http://localhost:8080/api/auth/users/${userId}`);
+          setUser(res.data);
+        } catch (err) {
+          console.error("Error fetching user:", err);
+        }
+      };
+      fetchUser();
+    }, [userId]);
 
   return (
     <div className="navbar">
       <div className="left">
         <Link to="/" style={{ textDecoration: "none" }}>
-         
+          <img src={Logo} alt="Logo" style={{ width: '150px' }}/>
         </Link>
-        <HomeOutlinedIcon />
-        {darkMode ? (
-          <WbSunnyOutlinedIcon onClick={toggle} />
-        ) : (
-          <DarkModeOutlinedIcon onClick={toggle} />
-        )}
-        <GridViewOutlinedIcon />
         <div className="search">
           <SearchOutlinedIcon />
           <input type="text" placeholder="Search..." />
         </div>
       </div>
       <div className="right">
-        <PersonOutlinedIcon />
-        <EmailOutlinedIcon />
         <NotificationsOutlinedIcon />
 
         {currentUser ? (
           <Link to={`/profile/${currentUser.id}`} style={{ textDecoration: "none", color: "inherit" }}>
             <div className="user">
               <img
-                src={"/upload/" + (currentUser.profilePic || "defaultProfilePic.png")}
+                src={user?.profilePic ? `http://localhost:8080/uploads/${user.profilePic}` : "/defaultCover.jpg"}
                 alt={currentUser.name || "User"}
               />
               <span>{currentUser.name || "Guest"}</span>
@@ -54,7 +52,7 @@ const Navbar = () => {
         ) : (
           <div className="user">
             <img
-              src={"/upload/defaultProfilePic.png"} // fallback image
+              src={"/upload/defaultProfilePic.png"}
               alt="Guest"
             />
             <span>Guest</span>

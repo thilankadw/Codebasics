@@ -1,0 +1,15 @@
+@import '../../styles/mixins';
+@import '../../styles/themes';
+@import '../../styles/variables';
+
+.phase-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-unit;
+  
+    .form-group {
+      label {
+        font-size: 14px;
+      }
+    }
+  }

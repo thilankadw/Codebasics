@@ -1,0 +1,20 @@
+$themes: (
+  light: (
+    textColor: #000,
+    bg: white,
+    logo: darkblue,
+    bgSoft: #f6f3f3,
+    textColorSoft: #555,
+    border: lightgray,
+    primary: #1EA9FF,
+    primaryHover: #195f8a,
+    danger: #f44336,
+    dangerHover: #d32f2f,
+    info: #2196F3,
+    infoHover: #0b7dda,
+    cardBg: white,
+    cardBorder: #ddd,
+    phaseCardBg: #f9f9f9,
+    resourcesBg: #f0f0f0
+  ),
+) !default;

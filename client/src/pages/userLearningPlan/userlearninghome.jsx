@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import './userlearningplan.css';
+import { AuthContext } from '../../context/authContext';
 
 const UserLearningPlanHome = () => {
+   const { currentUser } = useContext(AuthContext);
   const [allLearningPlans, setAllLearningPlans] = useState([]);
   const [publicSharedPlans, setPublicSharedPlans] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [subscribedPlans, setSubscribedPlans] = useState(new Set());
   const [searchTerm, setSearchTerm] = useState('');
-  const currentUserId = 1; // Replace with actual user ID from your auth system
+  const [currentUserId, setCurrentUserId] = useState(null);// Replace with actual user ID from your auth system
 
+  useEffect(() => {
+    setCurrentUserId(currentUser.id);
+  }, [currentUser])
   // Fetch all plans, public shared plans, and user's subscriptions
   useEffect(() => {
     const fetchData = async () => {
@@ -42,9 +47,9 @@ const UserLearningPlanHome = () => {
       }
     };
     
-    fetchData();
+   if(currentUserId) fetchData();
   }, [currentUserId]);
-
+ 
   const handleSubscribe = async (planId) => {
     try {
       setIsLoading(true);
@@ -52,7 +57,7 @@ const UserLearningPlanHome = () => {
       
       const response = await axios.post(
         'http://localhost:8080/api/user-learning-plans/subscribe',
-        {}, // empty body
+        null, // empty body
         {
           params: {
             planId: planId,
@@ -67,11 +72,16 @@ const UserLearningPlanHome = () => {
       // Update UI based on response
       if (response.data && response.data.id) {
         setSubscribedPlans(prev => new Set(prev).add(planId));
+        setError(null);
       }
-      
     } catch (error) {
-      console.error('Subscription error:', error.response?.data || error.message);
-      setError(error.response?.data?.message || 'Subscription failed. Please try again.');
+      console.error('Subscription error:', error);
+      if (error.response?.data) {
+        const errorMessage = error.response.data.error || 'Subscription failed. Please try again.';
+        setError(errorMessage);
+      } else {
+        setError('Subscription failed. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -181,7 +191,7 @@ const UserLearningPlanHome = () => {
       </div>
 
       {/* Public Shared Plans Section */}
-      <div className="public-shared-plans">
+     <div className="public-shared-plans">
         <h2>Reshared Plans</h2>
         
         {filterPlans(publicSharedPlans).length === 0 ? (
@@ -194,7 +204,7 @@ const UserLearningPlanHome = () => {
           </div>
         )}
       </div>
-    </div>
+    </div> 
   );
 };
 
