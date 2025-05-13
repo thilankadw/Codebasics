@@ -15,6 +15,26 @@ const LeftBar = () => {
     <div className="leftBar">
       <div className="container">
         <div className="menu">
+          <div className="user">
+            <img src={"/upload/" + currentUser.profilePic} alt="User" />
+            <span>{currentUser.name}</span>
+          </div>
+          <div className="item">
+            <img src={Friends} alt="Friends" />
+            <span>Friends</span>
+          </div>
+        </div>
+        <hr />
+        
+        <hr />
+        <div className="menu">
+          <span>Others</span>
+         
+       
+          <div className="item">
+            <img src={Courses} alt="Courses" />
+            <span>Courses</span>
+          </div>
           <Link to="/all-learning-plans" style={{ textDecoration: "none", color: "#000" }}>
             <div className="item">
               <img src={LearningPlan} alt="Learning Plan" />
