@@ -19,6 +19,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import RightBar from "./components/rightBar/RightBar";
 import "./style.scss";
 import Friends from "./components/Friends/Friends";
+import FindFriends from "./components/Friends/FindFriends";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -74,6 +75,10 @@ function App() {
         {
           path: "/friends",
           element: <Friends/>,
+        },
+        {
+          path: "/findfriends",
+          element: <FindFriends/>,
         },
         {
           path: "/mylearning-plans",

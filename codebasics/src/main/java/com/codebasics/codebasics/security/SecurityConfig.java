@@ -49,7 +49,8 @@ public class SecurityConfig {
                                         "api/user-learning-plans/**",
                                         "api/learning-plan/**",
                                         "uploads/**",
-                                "api/users/**"
+                                "api/users/**",
+                                "api/users"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )

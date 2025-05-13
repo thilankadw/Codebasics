@@ -68,6 +68,21 @@
         }
       }
     }
+    .follow-btn,
+.unfollow-btn {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.follow-btn {
+  background-color: #1da1f2;
+  color: white;
+}
     .friend-search {
         width: 80%;
         padding: 8px 12px;

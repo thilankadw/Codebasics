@@ -6,6 +6,7 @@ import LearningPlan from "../../assets/learningplan.png";
 import NewPlan from "../../assets/newplan.png";
 import SubscribePlan from "../../assets/subscribeplan.png";
 import ResharedPlan from "../../assets/resharedplan.png";
+import { Group, PersonRemove } from "@mui/icons-material";
 // import PrivatePlan from "../../assets/privateplan.png";
 
 const LeftBar = () => {
@@ -20,9 +21,17 @@ const LeftBar = () => {
             <span>{currentUser.name}</span>
           </div>
           <div className="item">
+          <Link to="/findfriends" style={{ textDecoration: "none", color: "#000" }}>
+  <div className="item">
+  <Group className="friend-icon" />
+    <span>Find Friends</span>
+  </div>
+</Link>
+          </div>
+          <div className="item">
           <Link to="/friends" style={{ textDecoration: "none", color: "#000" }}>
   <div className="item">
-    <img src="" alt="Friends" />
+  <Group className="friend-icon" />
     <span>Friends</span>
   </div>
 </Link>
