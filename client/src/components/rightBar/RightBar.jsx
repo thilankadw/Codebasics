@@ -37,7 +37,7 @@ const RightBar = ({ currentUserId }) => {
   };
 
   const handleUnfollow = (userIdToUnfollow) => {
-    axios.post(`http://localhost:8080/api/users/${currentUserId}/unfollow/${userIdToUnfollow}`)
+    axios.post(`http://localhost:8080/api/users/${currentUser.id}/unfollow/${userIdToUnfollow}`)
       .then(() => {
         // Remove from friend list
         setFriendList(prev => prev.filter(u => u.id !== userIdToUnfollow));
