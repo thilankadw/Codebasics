@@ -16,6 +16,7 @@ import CreateLearningPlanPage from "./pages/learningplan/CreateLearningPlanPage"
 import ViewLearningPlanPage from "./pages/learningplan/ViewLearningPlanPage";
 import ViewAllLearningPlansPage from "./pages/learningplan/ViewAllLearningPlansPage";
 import { ToastContainer, toast } from 'react-toastify';
+import RightBar from "./components/rightBar/RightBar";
 import "./style.scss";
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             <div style={{ flex: 6 }}>
               <Outlet />
             </div>
+            <RightBar />
           </div>
         </div>
       </QueryClientProvider>

@@ -20,7 +20,7 @@ const LeftBar = () => {
             <span>{currentUser.name}</span>
           </div>
           <div className="item">
-            <img src={Friends} alt="Friends" />
+            <img src="" alt="Friends" />
             <span>Friends</span>
           </div>
         </div>
@@ -32,7 +32,7 @@ const LeftBar = () => {
          
        
           <div className="item">
-            <img src={Courses} alt="Courses" />
+            <img src="" alt="Courses" />
             <span>Courses</span>
           </div>
           <Link to="/all-learning-plans" style={{ textDecoration: "none", color: "#000" }}>

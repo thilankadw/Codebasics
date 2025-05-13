@@ -87,7 +87,7 @@ const RightBar = ({ currentUserId }) => {
           {friendList.map((user) => (
             <div className="user" key={user.id}>
               <div className="userInfo">
-                <img src={user.profilePic || "https://via.placeholder.com/50"} alt="Friend" />
+                <img src={`http://localhost:8080/uploads/${user.profilePic}` || "https://via.placeholder.com/50"} alt="Friend" />
                 <span>{user.name}</span>
               </div>
               <div className="buttons">
