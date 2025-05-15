@@ -17,10 +17,6 @@ const MyLearningPlansPage = () => {
     skills: '',
     duration: '',
     imageUrl: '',
-    visibility: 'PRIVATE',
-    milestone1: 'incomplete',
-    milestone2: 'incomplete',
-    milestone3: 'incomplete'
   });
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -428,14 +424,14 @@ const MyLearningPlansPage = () => {
                       </div>
                       
                       <div className="plan-actions" onClick={(e) => e.stopPropagation()}>
-                        <button 
-                          onClick={(e) => handleEdit(plan, e)} 
+                        <button
+                          onClick={(e) => handleEdit(plan, e)}
                           className="edit-btn"
                         >
                           Edit
                         </button>
-                        <button 
-                          onClick={(e) => handleDelete(plan.id, e)} 
+                        <button
+                          onClick={(e) => handleDelete(plan.id, e)}
                           className="delete-btn"
                         >
                           Delete

@@ -1,5 +1,6 @@
 package com.codebasics.codebasics.service;
 
+import com.codebasics.codebasics.dto.UpdatePlanRequestDTO;
 import com.codebasics.codebasics.model.*;
 import com.codebasics.codebasics.repository.*;
 import org.springframework.stereotype.Service;
@@ -56,31 +57,17 @@ public class UserLearningPlanService {
         return userLearningPlanRepository.save(userPlan);
     }
 
-    public UserLearningPlan updatePlan(Long id, UserLearningPlan planDetails) {
+    @Transactional
+    public UserLearningPlan updatePlan(Long id, UpdatePlanRequestDTO request) {
         UserLearningPlan plan = userLearningPlanRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Plan not found with id: " + id));
 
-        // Validate milestone statuses
-        if (!isValidMilestoneStatus(planDetails.getMilestone1()) ||
-                !isValidMilestoneStatus(planDetails.getMilestone2()) ||
-                !isValidMilestoneStatus(planDetails.getMilestone3())) {
-            throw new RuntimeException("Invalid milestone status. Must be either 'complete' or 'incomplete'");
-        }
-
-        // Validate visibility
-        if (!isValidVisibility(planDetails.getVisibility())) {
-            throw new RuntimeException("Invalid visibility. Must be either 'PRIVATE' or 'PUBLIC'");
-        }
-
-        plan.setPlanName(planDetails.getPlanName());
-        plan.setDescription(planDetails.getDescription());
-        plan.setSkills(planDetails.getSkills());
-        plan.setDuration(planDetails.getDuration());
-        plan.setImageUrl(planDetails.getImageUrl());
-        plan.setVisibility(planDetails.getVisibility());
-        plan.setMilestone1(planDetails.getMilestone1());
-        plan.setMilestone2(planDetails.getMilestone2());
-        plan.setMilestone3(planDetails.getMilestone3());
+        plan.setPlanName(request.getPlanName());
+        plan.setDescription(request.getDescription());
+        plan.setSkills(request.getSkills());
+        plan.setDuration(request.getDuration());
+        plan.setImageUrl(request.getImageUrl() != null ? request.getImageUrl().trim() : "");
+        plan.setLastActivityDate(LocalDateTime.now());
 
         return userLearningPlanRepository.save(plan);
     }
