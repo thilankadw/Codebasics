@@ -4,31 +4,21 @@ import com.codebasics.codebasics.dto.UpdatePlanRequestDTO;
 import com.codebasics.codebasics.model.*;
 import com.codebasics.codebasics.repository.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserLearningPlanService {
     private final UserLearningPlanRepository userLearningPlanRepository;
     private final LearningPlanRepository learningPlanRepository;
-    private final LearningPlanPhaseRepository learningPlanPhaseRepository;
     private final UserRepository userRepository;
-    private final UserLearningPhaseProgressRepository userLearningPhaseProgressRepository;
 
     public UserLearningPlanService(
             UserLearningPlanRepository userLearningPlanRepository,
             LearningPlanRepository learningPlanRepository,
-            LearningPlanPhaseRepository learningPlanPhaseRepository,
-            UserRepository userRepository,
-            UserLearningPhaseProgressRepository userLearningPhaseProgressRepository) {
+            UserRepository userRepository) {
         this.userLearningPlanRepository = userLearningPlanRepository;
         this.learningPlanRepository = learningPlanRepository;
-        this.learningPlanPhaseRepository = learningPlanPhaseRepository;
         this.userRepository = userRepository;
-        this.userLearningPhaseProgressRepository = userLearningPhaseProgressRepository;
     }
 
     public List<UserLearningPlan> getAllPlans() {
@@ -40,7 +30,6 @@ public class UserLearningPlanService {
                 .orElseThrow(() -> new RuntimeException("Plan not found with id: " + id));
     }
 
-    @Transactional
     public UserLearningPlan subscribeToPlan(Long planId, Long userId) {
         LearningPlan originalPlan = learningPlanRepository.findById(planId)
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
@@ -48,39 +37,24 @@ public class UserLearningPlanService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        User actualOwner = userRepository.findById(originalPlan.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("Original plan owner not found"));
+        User originalOwner = originalPlan.getOwnerId();
 
         UserLearningPlan userPlan = new UserLearningPlan();
         userPlan.setPlanName(originalPlan.getPlanName());
         userPlan.setDescription(originalPlan.getDescription());
         userPlan.setSkills(originalPlan.getSkills());
         userPlan.setDuration(originalPlan.getDuration());
-        userPlan.setImageUrl(originalPlan.getImageUrl());
-        userPlan.setActualOwner(actualOwner);
+        String imageUrl = originalPlan.getImageUrl();
+        userPlan.setImageUrl(imageUrl != null && !imageUrl.trim().isEmpty() ? imageUrl.trim() : null);
+        userPlan.setActualOwner(originalOwner);
         userPlan.setCurrentOwner(user);
         userPlan.setVisibility("PRIVATE");
         userPlan.setOriginalPlanId(planId);
-        userPlan.setLearningPlanId(planId);
-        userPlan.setOverallStatus("NOT_STARTED");
-        userPlan.setSubscriptionDate(LocalDateTime.now());
-        userPlan.setLastActivityDate(LocalDateTime.now());
+        userPlan.setMilestone1("incomplete");
+        userPlan.setMilestone2("incomplete");
+        userPlan.setMilestone3("incomplete");
 
-        UserLearningPlan savedPlan = userLearningPlanRepository.save(userPlan);
-
-        List<LearningPlanPhase> phases = learningPlanPhaseRepository.findByLearningPlanId(planId);
-
-        for (LearningPlanPhase phase : phases) {
-            UserLearningPhaseProgress progress = new UserLearningPhaseProgress();
-            progress.setUserLearningPlan(savedPlan);
-            progress.setLearningPlanPhaseId(phase.getId());
-            progress.setStatus("NOT_STARTED");
-            progress.setLastUpdated(LocalDateTime.now());
-
-            savedPlan.addPhaseProgress(progress);
-        }
-
-        return userLearningPlanRepository.save(savedPlan);
+        return userLearningPlanRepository.save(userPlan);
     }
 
     @Transactional
@@ -98,21 +72,25 @@ public class UserLearningPlanService {
         return userLearningPlanRepository.save(plan);
     }
 
+    private boolean isValidMilestoneStatus(String status) {
+        return status != null && (status.equals("complete") || status.equals("incomplete"));
+    }
+
+    private boolean isValidVisibility(String visibility) {
+        return visibility != null && (visibility.equals("PRIVATE") || visibility.equals("PUBLIC"));
+    }
+
     public void deletePlan(Long id) {
         UserLearningPlan plan = getPlanById(id);
         userLearningPlanRepository.delete(plan);
     }
 
     public List<UserLearningPlan> getPlansByOwner(Long ownerId) {
-        User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new RuntimeException("Owner not found"));
-        return userLearningPlanRepository.findByActualOwner(owner);
+        return userLearningPlanRepository.findByActualOwnerId(ownerId);
     }
 
     public List<UserLearningPlan> getPlansByCurrentOwner(Long currentOwnerId) {
-        User currentOwner = userRepository.findById(currentOwnerId)
-                .orElseThrow(() -> new RuntimeException("Current owner not found"));
-        return userLearningPlanRepository.findByCurrentOwner(currentOwner);
+        return userLearningPlanRepository.findByCurrentOwnerId(currentOwnerId);
     }
 
     public List<UserLearningPlan> getPlansByVisibility(String visibility) {
@@ -123,40 +101,31 @@ public class UserLearningPlanService {
         UserLearningPlan plan = userLearningPlanRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Plan not found with id: " + id));
 
+        // If changing to PRIVATE, create a new copy for the recipient
+        if (visibility.equals("PRIVATE")) {
+            UserLearningPlan newPlan = new UserLearningPlan();
+            newPlan.setPlanName(plan.getPlanName());
+            newPlan.setDescription(plan.getDescription());
+            newPlan.setSkills(plan.getSkills());
+            newPlan.setDuration(plan.getDuration());
+            newPlan.setImageUrl(plan.getImageUrl());
+            newPlan.setActualOwner(plan.getActualOwner());
+            newPlan.setCurrentOwner(plan.getCurrentOwner());
+            newPlan.setVisibility(visibility);
+            newPlan.setOriginalPlanId(plan.getOriginalPlanId());
+            newPlan.setMilestone1(plan.getMilestone1());
+            newPlan.setMilestone2(plan.getMilestone2());
+            newPlan.setMilestone3(plan.getMilestone3());
+
+            return userLearningPlanRepository.save(newPlan);
+        }
+
+        // For PUBLIC visibility, just update the existing plan
         plan.setVisibility(visibility);
-        plan.setLastActivityDate(LocalDateTime.now());
         return userLearningPlanRepository.save(plan);
     }
 
-    @Transactional
-    public UserLearningPlan updatePhaseProgress(Long planId, Long phaseId, String status) {
-        UserLearningPlan plan = userLearningPlanRepository.findById(planId)
-                .orElseThrow(() -> new RuntimeException("User learning plan not found with id: " + planId));
-
-        UserLearningPhaseProgress phaseProgress = plan.getPhaseProgresses().stream()
-                .filter(progress -> progress.getLearningPlanPhaseId().equals(phaseId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Phase progress not found for phase id: " + phaseId));
-
-        phaseProgress.setStatus(status);
-
-        plan.updateOverallStatus();
-        plan.setLastActivityDate(LocalDateTime.now());
-
-        return userLearningPlanRepository.save(plan);
-    }
-
-    public List<UserLearningPhaseProgress> getPhaseProgressesByPlanId(Long planId) {
-        UserLearningPlan plan = userLearningPlanRepository.findById(planId)
-                .orElseThrow(() -> new RuntimeException("User learning plan not found with id: " + planId));
-
-        return plan.getPhaseProgresses();
-    }
-
-    public double calculatePlanProgressPercentage(Long planId) {
-        UserLearningPlan plan = userLearningPlanRepository.findById(planId)
-                .orElseThrow(() -> new RuntimeException("User learning plan not found with id: " + planId));
-
-        return plan.calculateOverallProgressPercentage();
+    public List<UserLearningPlan> getPlansByCurrentOwnerAndVisibility(Long currentOwnerId, String visibility) {
+        return userLearningPlanRepository.findByCurrentOwnerIdAndVisibility(currentOwnerId, visibility);
     }
 }

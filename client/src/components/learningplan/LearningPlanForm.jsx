@@ -1,18 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import LearningPlanPhaseForm from './LearningPlanPhaseForm';
 import './LearningPlanForm.scss';
-import { AuthContext } from '../../context/authContext';
 
 const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
-    const { currentUser } = useContext(AuthContext);
-
     const [learningPlan, setLearningPlan] = useState({
         planName: initialData.planName || '',
         description: initialData.description || '',
         skills: initialData.skills || '',
         duration: initialData.duration || '',
-        imageUrl: "https://res.cloudinary.com/dddahxznm/image/upload/v1745643813/web_developer_illustrator_1_dowg5x.jpg",
-        ownerId: currentUser.id || 1,
+        imageFile: null,
+        ownerId: initialData.ownerId || 1,
         phases: initialData.phases || []
     });
 
@@ -54,7 +51,7 @@ const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
                     description: '',
                     duration: '',
                     resources: '',
-                    imageUrl: "https://res.cloudinary.com/dddahxznm/image/upload/v1745645090/programming-background-collage_lotbxs.jpg"
+                    imageFile: null
                 }
             ]
         }));
@@ -93,7 +90,7 @@ const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
     return (
         <form onSubmit={handleSubmit} className="learning-plan-form">
             <div className="form-header">
-                <h2>Create New Learning Plan</h2>
+                <h2>{initialData.id ? 'Edit Learning Plan' : 'Create New Learning Plan'}</h2>
             </div>
 
             <div className="form-grid">
@@ -144,7 +141,7 @@ const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
                     />
                 </div>
 
-                {/* <div className="form-group full-width">
+                <div className="form-group full-width">
                     <label>Upload Image</label>
                     <input
                         type="file"
@@ -159,7 +156,7 @@ const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
                             />
                         </div>
                     )}
-                </div> */}
+                </div>
             </div>
 
             <div className="phases-section">

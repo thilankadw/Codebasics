@@ -1,31 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './LearningPlanPhaseForm.scss';
-import { toast } from 'react-toastify';
 
 const LearningPlanPhaseForm = ({ phase, onChange }) => {
-    const [uploading, setUploading] = useState(false);
-
-    const handleImageUpload = async (file) => {
-        setUploading(true);
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET);
-
-            const response = await fetch(
-                `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
-                { method: 'POST', body: formData }
-            );
-
-            const data = await response.json();
-            onChange({ ...phase, imageUrl: data.secure_url });
-        } catch (error) {
-            toast.error('Image upload failed');
-        } finally {
-            setUploading(false);
-        }
-    };
-    
     const handleChange = (e) => {
         const { name, value } = e.target;
         onChange({ ...phase, [name]: value });
@@ -63,7 +39,7 @@ const LearningPlanPhaseForm = ({ phase, onChange }) => {
                 <textarea name="resources" value={phase.resources} onChange={handleChange} required />
             </div>
 
-            {/* <div className="form-group">
+            <div className="form-group">
                 <label>Upload Image</label>
                 <input type="file" accept="image/*" onChange={handleFileChange} />
                 {phase.imageFile && (
@@ -71,7 +47,7 @@ const LearningPlanPhaseForm = ({ phase, onChange }) => {
                         <img src={URL.createObjectURL(phase.imageFile)} alt="Phase Preview" />
                     </div>
                 )}
-            </div> */}
+            </div>
         </div>
     );
 };

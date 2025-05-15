@@ -12,20 +12,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PostInteractionDTO {
 
-    private Long id;
     private Long userId;
     private InteractionType type;
     private String content;
     private Long postId;
     private LocalDateTime timestamp;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getUserId() {
         return userId;

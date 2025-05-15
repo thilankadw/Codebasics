@@ -5,7 +5,7 @@ import { AuthContext } from '../../context/authContext';
 import { Link } from 'react-router-dom';
 
 const MyLearningPlansPage = () => {
-  const { currentUser } = useContext(AuthContext);
+    const { currentUser } = useContext(AuthContext);
   const [myLearningPlans, setMyLearningPlans] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState(null);
@@ -29,7 +29,7 @@ const MyLearningPlansPage = () => {
   }, [currentUser])
 
   useEffect(() => {
-    if (userId) fetchLearningPlans();
+    if(userId) fetchLearningPlans();
   }, [userId]);
 
   const showAlert = (message, type) => {
@@ -60,15 +60,9 @@ const MyLearningPlansPage = () => {
   const confirmShare = async () => {
     if (planToShare) {
       try {
-        await axios.put(`http://localhost:8080/api/user-learning-plans/share/${planToShare}`, {
-          "visibility": "PUBLIC"
-        }, {
-          headers: {
-            Authorization: `Bearer ${currentUser.token}`
-          },
-          withCredentials: true,
-        }
-        );
+        await axios.put(`http://localhost:8080/api/user-learning-plans/share/${planToShare}`, null, {
+          params: { visibility: 'PUBLIC' }
+        });
         showAlert('Plan shared successfully!', 'success');
         fetchLearningPlans();
       } catch (error) {
@@ -138,7 +132,10 @@ const MyLearningPlansPage = () => {
       skills: plan.skills,
       duration: plan.duration,
       imageUrl: plan.imageUrl,
-      visibility: plan.visibility || 'PRIVATE'
+      visibility: plan.visibility || 'PRIVATE',
+      milestone1: plan.milestone1 || 'incomplete',
+      milestone2: plan.milestone2 || 'incomplete',
+      milestone3: plan.milestone3 || 'incomplete'
     });
   };
 
@@ -149,7 +146,6 @@ const MyLearningPlansPage = () => {
       [name]: value
     });
   };
-
   const validateEditForm = () => {
     const errors = [];
 
@@ -158,6 +154,12 @@ const MyLearningPlansPage = () => {
     if (!editFormData.skills.trim()) errors.push('Skills are required.');
     if (!editFormData.duration.trim()) errors.push('Duration is required.');
 
+    // if (
+    //   editFormData.imageUrl &&
+    //   !/^https:\/\/imagedelivery\.net\/[a-zA-Z0-9\-]+\/[a-zA-Z0-9\-]+\/dirEntryThumbnail$/.test(editFormData.imageUrl)
+    // ) {
+    //   errors.push('Image URL must be in the format: https://imagedelivery.net/.../.../dirEntryThumbnail');
+    // }
     return errors;
   };
 
@@ -171,11 +173,13 @@ const MyLearningPlansPage = () => {
     }
 
     try {
+      // Trim the imageUrl before sending
       const dataToSend = {
         ...editFormData,
         imageUrl: editFormData.imageUrl?.trim() || ''
       };
-
+      
+      console.log('Sending update request with data:', dataToSend);
       const response = await axios.put(`http://localhost:8080/api/user-learning-plans/${planId}`, dataToSend);
       setEditingPlan(null);
       showAlert('Plan updated successfully!', 'success');
@@ -184,6 +188,7 @@ const MyLearningPlansPage = () => {
       console.error('Error updating learning plan:', error);
       if (error.response?.data) {
         const validationErrors = error.response.data;
+        console.log('Validation errors:', validationErrors);
         const errorMessages = Object.entries(validationErrors)
           .map(([field, message]) => `${field}: ${message}`)
           .join('\n');
@@ -194,70 +199,37 @@ const MyLearningPlansPage = () => {
     }
   };
 
+  const handleMilestoneToggle = (milestoneField) => {
+    setEditFormData({
+      ...editFormData,
+      [milestoneField]: editFormData[milestoneField] === 'complete' ? 'incomplete' : 'complete'
+    });
+  };
+
+  // const handleUpdate = async (planId, e) => {
+  //   e.stopPropagation();
+  //   try {
+  //     await axios.put(`http://localhost:8080/api/user-learning-plans/${planId}`, editFormData);
+  //     setEditingPlan(null);
+  //     showAlert('Plan updated successfully!', 'success');
+  //     fetchLearningPlans();
+  //   } catch (error) {
+  //     console.error('Error updating learning plan:', error);
+  //     showAlert('Failed to update plan', 'error');
+  //   }
+  // };
+
   const handleCancelEdit = (e) => {
     e.stopPropagation();
     setEditingPlan(null);
   };
 
-  const updatePhaseStatus = async (planId, phaseId, currentStatus) => {
-    try {
-      const newStatus = currentStatus === 'COMPLETED' ? 'NOT_STARTED' : 'COMPLETED';
-      await axios.put(
-        `http://localhost:8080/api/user-learning-plans/${planId}/phases/${phaseId}/status`,
-        { status: newStatus }
-      );
-      
-      // Update local state to reflect the change
-      setMyLearningPlans(prevPlans => 
-        prevPlans.map(plan => {
-          if (plan.id === planId) {
-            return {
-              ...plan,
-              phaseProgresses: plan.phaseProgresses.map(phase => {
-                if (phase.phaseId === phaseId) {
-                  return { ...phase, status: newStatus };
-                }
-                return phase;
-              })
-            };
-          }
-          return plan;
-        })
-      );
-      
-      // Also update viewingPlan if it's currently being viewed
-      if (viewingPlan && viewingPlan.id === planId) {
-        setViewingPlan(prev => ({
-          ...prev,
-          phaseProgresses: prev.phaseProgresses.map(phase => {
-            if (phase.phaseId === phaseId) {
-              return { ...phase, status: newStatus };
-            }
-            return phase;
-          })
-        }));
-      }
-      
-      showAlert('Phase status updated!', 'success');
-    } catch (error) {
-      console.error('Error updating phase status:', error);
-      showAlert('Failed to update phase status', 'error');
-    }
-  };
-
-  const renderPhaseStatus = (status) => {
+  const renderMilestoneStatus = (status) => {
     return (
-      <span className={`phase-status ${status.toLowerCase().replace('_', '-')}`}>
-        {status === 'COMPLETED' ? '✓ Completed' : 
-         status === 'IN_PROGRESS' ? '↻ In Progress' : '✗ Not Started'}
+      <span className={`milestone-status ${status}`}>
+        {status === 'complete' ? '✓ Completed' : '✗ Incomplete'}
       </span>
     );
-  };
-
-  const calculateProgressPercentage = (phases) => {
-    if (!phases || phases.length === 0) return 0;
-    const completedCount = phases.filter(phase => phase.status === 'COMPLETED').length;
-    return Math.round((completedCount / phases.length) * 100);
   };
 
   return (
@@ -266,8 +238,8 @@ const MyLearningPlansPage = () => {
       {alert.show && (
         <div className={`alert alert-${alert.type}`}>
           {alert.message}
-          <button
-            className="alert-close"
+          <button 
+            className="alert-close" 
             onClick={() => setAlert({ ...alert, show: false })}
           >
             ×
@@ -322,9 +294,9 @@ const MyLearningPlansPage = () => {
         ) : (
           <div className="plans-grid">
             {myLearningPlans.map((plan) => (
-              <div
-                key={plan.id}
-                className="plan-card"
+              <div 
+                key={plan.id} 
+                className="plan-card" 
                 onClick={() => handleCardClick(plan.id)}
               >
                 {plan.imageUrl && (
@@ -332,11 +304,11 @@ const MyLearningPlansPage = () => {
                     <img src={plan.imageUrl} alt={plan.planName} className="plan-image" />
                   </div>
                 )}
-
+                
                 <div className="plan-content">
                   {editingPlan === plan.id ? (
                     <div className="edit-form" onClick={(e) => e.stopPropagation()}>
-                      <label>Plan Name</label>
+                      <label>plan Name</label>
                       <input
                         type="text"
                         name="planName"
@@ -353,7 +325,7 @@ const MyLearningPlansPage = () => {
                         placeholder="Description"
                         className={`edit-input ${!editFormData.description.trim() ? 'input-error' : ''}`}
                       />
-                      <label>Skills</label>
+                      <label>skills</label>
                       <input
                         type="text"
                         name="skills"
@@ -371,7 +343,7 @@ const MyLearningPlansPage = () => {
                         placeholder="Duration"
                         className={`edit-input ${!editFormData.duration.trim() ? 'input-error' : ''}`}
                       />
-                      <label>Image URL</label>
+                      <label>ImageUrl</label>
                       <input
                         type="text"
                         name="imageUrl"
@@ -380,7 +352,42 @@ const MyLearningPlansPage = () => {
                         placeholder="Image URL"
                         className="edit-input"
                       />
-
+                      
+                      <div className="milestone-editor">
+                        <h4>Milestones:</h4>
+                        <h6>click milestone to change the status</h6>
+                        <div className="milestone-item">
+                          <label>Milestone 1:</label>
+                          <button 
+                            className={`milestone-toggle ${editFormData.milestone1}`}
+                            onClick={() => handleMilestoneToggle('milestone1')}
+                            type="button"
+                          >
+                            {editFormData.milestone1 === 'complete' ? '✓ Completed' : '✗ Incomplete'}
+                          </button>
+                        </div>
+                        <div className="milestone-item">
+                          <label>Milestone 2:</label>
+                          <button 
+                            className={`milestone-toggle ${editFormData.milestone2}`}
+                            onClick={() => handleMilestoneToggle('milestone2')}
+                            type="button"
+                          >
+                            {editFormData.milestone2 === 'complete' ? '✓ Completed' : '✗ Incomplete'}
+                          </button>
+                        </div>
+                        <div className="milestone-item">
+                          <label>Milestone 3:</label>
+                          <button 
+                            className={`milestone-toggle ${editFormData.milestone3}`}
+                            onClick={() => handleMilestoneToggle('milestone3')}
+                            type="button"
+                          >
+                            {editFormData.milestone3 === 'complete' ? '✓ Completed' : '✗ Incomplete'}
+                          </button>
+                        </div>
+                      </div>
+                      
                       <div className="edit-buttons">
                         <button onClick={(e) => handleUpdate(plan.id, e)} className="save-btn">
                           Save
@@ -399,19 +406,23 @@ const MyLearningPlansPage = () => {
                         <span className="visibility"><strong>Status:</strong> {plan.visibility}</span>
                       </div>
                       <p className="plan-description">{plan.description}</p>
-
-                      <div className="progress-container">
-                        <div className="progress-bar">
-                          <div 
-                            className="progress-fill" 
-                            style={{ width: `${calculateProgressPercentage(plan.phaseProgresses)}%` }}
-                          ></div>
+                      
+                      <div className="milestones-display">
+                        <h4>Progress:</h4>
+                        <div className="milestone-item">
+                          <span>Milestone 1:</span>
+                          {renderMilestoneStatus(plan.milestone1)}
                         </div>
-                        <span className="progress-percentage">
-                          {calculateProgressPercentage(plan.phaseProgresses)}% Complete
-                        </span>
+                        <div className="milestone-item">
+                          <span>Milestone 2:</span>
+                          {renderMilestoneStatus(plan.milestone2)}
+                        </div>
+                        <div className="milestone-item">
+                          <span>Milestone 3:</span>
+                          {renderMilestoneStatus(plan.milestone3)}
+                        </div>
                       </div>
-
+                      
                       <div className="plan-actions" onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={(e) => handleEdit(plan, e)}
@@ -425,8 +436,8 @@ const MyLearningPlansPage = () => {
                         >
                           Delete
                         </button>
-                        <button
-                          onClick={(e) => handleShare(plan.id)}
+                        <button 
+                          onClick={(e) => handleShare(plan.id)} 
                           className="share-btn"
                           disabled={plan.visibility === 'PUBLIC'}
                         >
@@ -447,62 +458,40 @@ const MyLearningPlansPage = () => {
         <div className="plan-modal-overlay">
           <div className="plan-modal">
             <button className="close-modal" onClick={handleCloseView}>×</button>
-
+            
             {viewingPlan.imageUrl && (
               <div className="modal-image-container">
                 <img src={viewingPlan.imageUrl} alt={viewingPlan.planName} className="modal-image" />
               </div>
             )}
-
+            
             <div className="modal-content">
               <h3>{viewingPlan.planName}</h3>
               <div className="modal-meta">
-                <p><strong>Durationssdsds:</strong> {viewingPlan.duration}</p>
+                <p><strong>Duration:</strong> {viewingPlan.duration}</p>
                 <p><strong>Skills:</strong> {viewingPlan.skills}</p>
-                <p><strong>Status:</strong> {viewingPlan.overallStatus || 'NOT_STARTED'}</p>
+                <p><strong>Actual Owner:</strong> {viewingPlan.actualOwner?.name || 'Unknown'}</p>
                 <p><strong>Visibility:</strong> {viewingPlan.visibility || 'PRIVATE'}</p>
               </div>
               <div className="modal-description">
                 <h4>Description</h4>
                 <p>{viewingPlan.description}</p>
               </div>
-
-              <div className="progress-container">
-                <div className="progress-bar">
-                  <div 
-                    className="progress-fill" 
-                    style={{ width: `${viewingPlan.progressPercentage || 0}%` }}
-                  ></div>
+              
+              <div className="milestones-display">
+                <h3>Progress:</h3>
+                <div className="milestone-item">
+                  <span>Milestone 1:</span>
+                  {renderMilestoneStatus(viewingPlan.milestone1 || 'incomplete')}
                 </div>
-                <span className="progress-percentage">
-                  {viewingPlan.progressPercentage || 0}% Complete
-                </span>
-              </div>
-
-              <div className="phases-section">
-                <h4>Learning Phases:</h4>
-                {viewingPlan.phaseProgresses && viewingPlan.phaseProgresses.length > 0 ? (
-                  <ul className="phases-list">
-                    {viewingPlan.phaseProgresses.map((phase) => (
-                      <li key={phase.phaseId} className="phase-item">
-                        <div className="phase-info">
-                          <span className="phase-title">Phase {phase.phaseId}</span>
-                          {phase.topic && <span className="phase-topic">{phase.topic}</span>}
-                          {phase.skill && <span className="phase-skill">{phase.skill}</span>}
-                          {phase.phaseDescription && <p className="phase-description">{phase.phaseDescription}</p>}
-                        </div>
-                        <button
-                          className={`phase-status-btn ${phase.status.toLowerCase().replace('_', '-')}`}
-                          onClick={() => updatePhaseStatus(viewingPlan.id, phase.phaseId, phase.status)}
-                        >
-                          {renderPhaseStatus(phase.status)}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No phases available for this plan.</p>
-                )}
+                <div className="milestone-item">
+                  <span>Milestone 2:</span>
+                  {renderMilestoneStatus(viewingPlan.milestone2 || 'incomplete')}
+                </div>
+                <div className="milestone-item">
+                  <span>Milestone 3:</span>
+                  {renderMilestoneStatus(viewingPlan.milestone3 || 'incomplete')}
+                </div>
               </div>
             </div>
           </div>
