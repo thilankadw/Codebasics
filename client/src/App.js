@@ -16,7 +16,10 @@ import CreateLearningPlanPage from "./pages/learningplan/CreateLearningPlanPage"
 import ViewLearningPlanPage from "./pages/learningplan/ViewLearningPlanPage";
 import ViewAllLearningPlansPage from "./pages/learningplan/ViewAllLearningPlansPage";
 import { ToastContainer, toast } from 'react-toastify';
+import RightBar from "./components/rightBar/RightBar";
 import "./style.scss";
+import Friends from "./components/Friends/Friends";
+import FindFriends from "./components/Friends/FindFriends";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -34,6 +37,7 @@ function App() {
             <div style={{ flex: 6 }}>
               <Outlet />
             </div>
+            <RightBar />
           </div>
         </div>
       </QueryClientProvider>
@@ -67,6 +71,14 @@ function App() {
         {
           path: "/learning-plans",
           element: <LearningPlanHome />,
+        },
+        {
+          path: "/friends",
+          element: <Friends/>,
+        },
+        {
+          path: "/findfriends",
+          element: <FindFriends/>,
         },
         {
           path: "/mylearning-plans",
