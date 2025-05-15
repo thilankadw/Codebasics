@@ -1,5 +1,9 @@
 package com.codebasics.codebasics.dto;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserLearningPlanDto {
     private Long id;
     private String planName;
@@ -11,17 +15,23 @@ public class UserLearningPlanDto {
     private Long currentOwnerId;
     private String visibility;
     private Long originalPlanId;
-    private String milestone1;
-    private String milestone2;
-    private String milestone3;
+    private Long learningPlanId;
+    private String overallStatus;
+    private LocalDateTime subscriptionDate;
+    private LocalDateTime completionDate;
+    private LocalDateTime lastActivityDate;
+    private List<PhaseProgressDto> phaseProgresses = new ArrayList<>();
+    private double progressPercentage;
 
     public UserLearningPlanDto() {
     }
 
-    public UserLearningPlanDto(Long id, String planName, String description, String skills, 
-                             String duration, String imageUrl, Long actualOwnerId, 
-                             Long currentOwnerId, String visibility, Long originalPlanId,
-                             String milestone1, String milestone2, String milestone3) {
+    public UserLearningPlanDto(Long id, String planName, String description, String skills,
+                               String duration, String imageUrl, Long actualOwnerId,
+                               Long currentOwnerId, String visibility, Long originalPlanId,
+                               Long learningPlanId, String overallStatus,
+                               LocalDateTime subscriptionDate, LocalDateTime completionDate,
+                               LocalDateTime lastActivityDate) {
         this.id = id;
         this.planName = planName;
         this.description = description;
@@ -32,9 +42,11 @@ public class UserLearningPlanDto {
         this.currentOwnerId = currentOwnerId;
         this.visibility = visibility;
         this.originalPlanId = originalPlanId;
-        this.milestone1 = milestone1;
-        this.milestone2 = milestone2;
-        this.milestone3 = milestone3;
+        this.learningPlanId = learningPlanId;
+        this.overallStatus = overallStatus;
+        this.subscriptionDate = subscriptionDate;
+        this.completionDate = completionDate;
+        this.lastActivityDate = lastActivityDate;
     }
 
     // Getters and Setters
@@ -118,27 +130,149 @@ public class UserLearningPlanDto {
         this.originalPlanId = originalPlanId;
     }
 
-    public String getMilestone1() {
-        return milestone1;
+    public Long getLearningPlanId() {
+        return learningPlanId;
     }
 
-    public void setMilestone1(String milestone1) {
-        this.milestone1 = milestone1;
+    public void setLearningPlanId(Long learningPlanId) {
+        this.learningPlanId = learningPlanId;
     }
 
-    public String getMilestone2() {
-        return milestone2;
+    public String getOverallStatus() {
+        return overallStatus;
     }
 
-    public void setMilestone2(String milestone2) {
-        this.milestone2 = milestone2;
+    public void setOverallStatus(String overallStatus) {
+        this.overallStatus = overallStatus;
     }
 
-    public String getMilestone3() {
-        return milestone3;
+    public LocalDateTime getSubscriptionDate() {
+        return subscriptionDate;
     }
 
-    public void setMilestone3(String milestone3) {
-        this.milestone3 = milestone3;
+    public void setSubscriptionDate(LocalDateTime subscriptionDate) {
+        this.subscriptionDate = subscriptionDate;
+    }
+
+    public LocalDateTime getCompletionDate() {
+        return completionDate;
+    }
+
+    public void setCompletionDate(LocalDateTime completionDate) {
+        this.completionDate = completionDate;
+    }
+
+    public LocalDateTime getLastActivityDate() {
+        return lastActivityDate;
+    }
+
+    public void setLastActivityDate(LocalDateTime lastActivityDate) {
+        this.lastActivityDate = lastActivityDate;
+    }
+
+    public List<PhaseProgressDto> getPhaseProgresses() {
+        return phaseProgresses;
+    }
+
+    public void setPhaseProgresses(List<PhaseProgressDto> phaseProgresses) {
+        this.phaseProgresses = phaseProgresses;
+    }
+
+    public double getProgressPercentage() {
+        return progressPercentage;
+    }
+
+    public void setProgressPercentage(double progressPercentage) {
+        this.progressPercentage = progressPercentage;
+    }
+
+    // Inner DTO class for phase progress
+    public static class PhaseProgressDto {
+        private Long id;
+        private Long phaseId;
+        private String status;
+        private LocalDateTime completionDate;
+        private LocalDateTime lastUpdated;
+
+        // Additional fields from LearningPlanPhase that might be useful
+        private String topic;
+        private String skill;
+        private String phaseDescription;
+        private String phaseDuration;
+
+        public PhaseProgressDto() {
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public Long getPhaseId() {
+            return phaseId;
+        }
+
+        public void setPhaseId(Long phaseId) {
+            this.phaseId = phaseId;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public LocalDateTime getCompletionDate() {
+            return completionDate;
+        }
+
+        public void setCompletionDate(LocalDateTime completionDate) {
+            this.completionDate = completionDate;
+        }
+
+        public LocalDateTime getLastUpdated() {
+            return lastUpdated;
+        }
+
+        public void setLastUpdated(LocalDateTime lastUpdated) {
+            this.lastUpdated = lastUpdated;
+        }
+
+        public String getTopic() {
+            return topic;
+        }
+
+        public void setTopic(String topic) {
+            this.topic = topic;
+        }
+
+        public String getSkill() {
+            return skill;
+        }
+
+        public void setSkill(String skill) {
+            this.skill = skill;
+        }
+
+        public String getPhaseDescription() {
+            return phaseDescription;
+        }
+
+        public void setPhaseDescription(String phaseDescription) {
+            this.phaseDescription = phaseDescription;
+        }
+
+        public String getPhaseDuration() {
+            return phaseDuration;
+        }
+
+        public void setPhaseDuration(String phaseDuration) {
+            this.phaseDuration = phaseDuration;
+        }
     }
 }

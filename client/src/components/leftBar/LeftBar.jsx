@@ -21,30 +21,25 @@ const LeftBar = () => {
             <span>{currentUser.name}</span>
           </div>
           <div className="item">
-          <Link to="/findfriends" style={{ textDecoration: "none", color: "#000" }}>
-  <div className="item">
-  <Group className="friend-icon" />
-    <span>Find Friends</span>
-  </div>
-</Link>
+            <Link to="/findfriends" style={{ textDecoration: "none", color: "#000" }}>
+              <div className="item">
+                <Group className="friend-icon" />
+                <span>Find Friends</span>
+              </div>
+            </Link>
           </div>
           <div className="item">
-          <Link to="/friends" style={{ textDecoration: "none", color: "#000" }}>
-  <div className="item">
-  <Group className="friend-icon" />
-    <span>Friends</span>
-  </div>
-</Link>
+            <Link to="/friends" style={{ textDecoration: "none", color: "#000" }}>
+              <div className="item">
+                <Group className="friend-icon" />
+                <span>Friends</span>
+              </div>
+            </Link>
           </div>
         </div>
         <hr />
-        
-        <hr />
         <div className="menu">
-          <span>Others</span>
-         
-       
-          <div className="item">
+          <div className="user">
             <img src="" alt="Courses" />
             <span>Courses</span>
           </div>
@@ -67,8 +62,8 @@ const LeftBar = () => {
             </div>
           </Link>
 
-            {/* ✅ New Reshared Plans Link */}
-            <Link to="/learning-plans" style={{ textDecoration: "none", color: "#000" }}>
+          {/* ✅ New Reshared Plans Link */}
+          <Link to="/learning-plans" style={{ textDecoration: "none", color: "#000" }}>
             <div className="item">
               <img src={ResharedPlan} alt="Reshared Plan" />
               <span>Reshared Plans</span>
