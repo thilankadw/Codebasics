@@ -12,6 +12,8 @@ const UserLearningPlanHome = () => {
   const [subscribedPlans, setSubscribedPlans] = useState(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [currentUserId, setCurrentUserId] = useState(null);// Replace with actual user ID from your auth system
+  const [durationFilter, setDurationFilter] = useState('all');
+  const [skillFilter, setSkillFilter] = useState('all');
 
   useEffect(() => {
     setCurrentUserId(currentUser.id);
@@ -87,16 +89,28 @@ const UserLearningPlanHome = () => {
     }
   };
 
-  // Filter plans based on search term
+  // Enhanced filter function
   const filterPlans = (plans) => {
-    if (!searchTerm) return plans;
+    if (!plans) return [];
     
-    const term = searchTerm.toLowerCase();
-    return plans.filter(plan => 
-      plan.planName.toLowerCase().includes(term) ||
-      (plan.description && plan.description.toLowerCase().includes(term)) ||
-      (plan.skills && plan.skills.toLowerCase().includes(term))
-    );
+    return plans.filter(plan => {
+      // Text search filter
+      const term = searchTerm.toLowerCase();
+      const matchesSearch = !searchTerm || 
+        plan.planName.toLowerCase().includes(term) ||
+        (plan.description && plan.description.toLowerCase().includes(term)) ||
+        (plan.skills && plan.skills.toLowerCase().includes(term));
+
+      // Duration filter
+      const matchesDuration = durationFilter === 'all' || 
+        (plan.duration && plan.duration.toLowerCase().includes(durationFilter));
+
+      // Skills filter
+      const matchesSkill = skillFilter === 'all' || 
+        (plan.skills && plan.skills.toLowerCase().includes(skillFilter));
+
+      return matchesSearch && matchesDuration && matchesSkill;
+    });
   };
 
   // Render loading state
@@ -156,23 +170,54 @@ const UserLearningPlanHome = () => {
 
   return (
     <div className="learning-plan-container">
-      {/* Search Bar */}
+      {/* Search and Filter Bar */}
       <div className="search-container">
-        <input
-          type="text"
-          placeholder="Search plans by name, description, or skills..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="search-input"
-        />
-        {searchTerm && (
-          <button 
-            onClick={() => setSearchTerm('')} 
-            className="clear-search-btn"
+        <div className="search-filters">
+          <input
+            type="text"
+            placeholder="Search plans by name, description, or skills..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          
+          <select 
+            value={durationFilter} 
+            onChange={(e) => setDurationFilter(e.target.value)}
+            className="filter-select"
           >
-            Clear
-          </button>
-        )}
+            <option value="all">All Durations</option>
+            <option value="3 month">3 Months</option>
+            <option value="6 month">6 Months</option>
+            <option value="1 year">1 Year</option>
+          </select>
+
+          <select 
+            value={skillFilter} 
+            onChange={(e) => setSkillFilter(e.target.value)}
+            className="filter-select"
+          >
+            <option value="all">All Skills</option>
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+            <option value="javascript">JavaScript</option>
+            <option value="react">React</option>
+            <option value="node">Node.js</option>
+          </select>
+
+          {(searchTerm || durationFilter !== 'all' || skillFilter !== 'all') && (
+            <button 
+              onClick={() => {
+                setSearchTerm('');
+                setDurationFilter('all');
+                setSkillFilter('all');
+              }} 
+              className="clear-search-btn"
+            >
+              Clear All
+            </button>
+          )}
+        </div>
       </div>
 
       {/* All Learning Plans Section */}
