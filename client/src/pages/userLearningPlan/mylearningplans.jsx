@@ -138,7 +138,6 @@ const MyLearningPlansPage = () => {
       skills: plan.skills,
       duration: plan.duration,
       imageUrl: plan.imageUrl,
-      visibility: plan.visibility || 'PRIVATE'
     });
   };
 
