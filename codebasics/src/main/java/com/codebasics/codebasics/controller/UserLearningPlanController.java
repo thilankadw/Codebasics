@@ -1,13 +1,18 @@
 package com.codebasics.codebasics.controller;
 
+import com.codebasics.codebasics.dto.UpdatePlanRequestDTO;
 import com.codebasics.codebasics.model.UserLearningPlan;
 import com.codebasics.codebasics.model.UserLearningPhaseProgress;
 import com.codebasics.codebasics.model.LearningPlanPhase;
 import com.codebasics.codebasics.dto.UserLearningPlanDto;
 import com.codebasics.codebasics.service.UserLearningPlanService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
@@ -98,10 +103,21 @@ public class UserLearningPlanController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserLearningPlanDto> updatePlan(@PathVariable Long id, @RequestBody UserLearningPlan plan) {
-        UserLearningPlan updatedPlan = userLearningPlanService.updatePlan(id, plan);
-        UserLearningPlanDto dto = convertToDto(updatedPlan);
-        return ResponseEntity.ok(dto);
+    public ResponseEntity<?> updatePlan(@PathVariable Long id, @Valid @RequestBody UpdatePlanRequestDTO request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        try {
+            UserLearningPlan updatedPlan = userLearningPlanService.updatePlan(id, request);
+            UserLearningPlanDto dto = convertToDto(updatedPlan);
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")

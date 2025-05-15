@@ -1,5 +1,6 @@
 package com.codebasics.codebasics.service;
 
+import com.codebasics.codebasics.dto.UpdatePlanRequestDTO;
 import com.codebasics.codebasics.model.*;
 import com.codebasics.codebasics.repository.*;
 import org.springframework.stereotype.Service;
@@ -83,16 +84,15 @@ public class UserLearningPlanService {
     }
 
     @Transactional
-    public UserLearningPlan updatePlan(Long id, UserLearningPlan planDetails) {
+    public UserLearningPlan updatePlan(Long id, UpdatePlanRequestDTO request) {
         UserLearningPlan plan = userLearningPlanRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Plan not found with id: " + id));
 
-        plan.setPlanName(planDetails.getPlanName());
-        plan.setDescription(planDetails.getDescription());
-        plan.setSkills(planDetails.getSkills());
-        plan.setDuration(planDetails.getDuration());
-        plan.setImageUrl(planDetails.getImageUrl());
-        plan.setVisibility(planDetails.getVisibility());
+        plan.setPlanName(request.getPlanName());
+        plan.setDescription(request.getDescription());
+        plan.setSkills(request.getSkills());
+        plan.setDuration(request.getDuration());
+        plan.setImageUrl(request.getImageUrl() != null ? request.getImageUrl().trim() : "");
         plan.setLastActivityDate(LocalDateTime.now());
 
         return userLearningPlanRepository.save(plan);

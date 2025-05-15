@@ -1,5 +1,6 @@
 package com.codebasics.codebasics.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -40,10 +41,12 @@ public class UserLearningPlan {
 
     @ManyToOne
     @JoinColumn(name = "actual_owner_id")
+    @JsonBackReference
     private User actualOwner;
 
     @ManyToOne
     @JoinColumn(name = "current_owner_id")
+    @JsonBackReference
     private User currentOwner;
 
     @Pattern(regexp = "^(PRIVATE|PUBLIC)$", message = "Visibility must be either PRIVATE or PUBLIC")

@@ -17,7 +17,6 @@ const MyLearningPlansPage = () => {
     skills: '',
     duration: '',
     imageUrl: '',
-    visibility: 'PRIVATE'
   });
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -414,12 +413,12 @@ const MyLearningPlansPage = () => {
                       </div>
 
                       <div className="plan-actions" onClick={(e) => e.stopPropagation()}>
-                        {/* <button
+                        <button
                           onClick={(e) => handleEdit(plan, e)}
                           className="edit-btn"
                         >
                           Edit
-                        </button> */}
+                        </button>
                         <button
                           onClick={(e) => handleDelete(plan.id, e)}
                           className="delete-btn"
