@@ -818,3 +818,33 @@ background-color: #e0e0e0;
 .confirm-share-btn:hover {
 background-color: #0056b3;
 }
+.search-filters {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.filter-select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 150px;
+}
+
+.search-input {
+  flex-grow: 1;
+}
+
+.clear-search-btn {
+  padding: 8px 16px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.clear-search-btn:hover {
+  background-color: #d32f2f;
+}
