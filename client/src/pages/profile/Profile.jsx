@@ -25,22 +25,40 @@ const Profile = () => {
   const { id } = useParams();
   const userId = parseInt(id);
 
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowed, setIsFollowed] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndStatus = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/auth/users/${userId}`);
-        setUser(res.data);
+        const [userRes, statusRes] = await Promise.all([
+          axios.get(`http://localhost:8080/api/auth/users/${userId}`),
+          axios.get(`http://localhost:8080/api/users/${currentUser.id}/is-following/${userId}`, {
+            withCredentials: true,
+          }),
+        ]);
+        setUser(userRes.data);
+        setIsFollowed(statusRes.data === true);
       } catch (err) {
-        console.error("Error fetching user:", err);
+        console.error("Error fetching user or follow status:", err);
       }
     };
-    fetchUser();
-  }, [userId]);
+    if (userId !== currentUser.id) {
+      fetchUserAndStatus();
+    } else {
+      axios.get(`http://localhost:8080/api/auth/users/${userId}`)
+        .then(res => setUser(res.data))
+        .catch(err => console.error("Error fetching user:", err));
+    }
+  }, [userId, currentUser.id]);
 
-  const handleFollow = () => {
-    setIsFollowing(!isFollowing);
+  const handleFollowToggle = () => {
+    const endpoint = isFollowed
+      ? `http://localhost:8080/api/users/${currentUser.id}/unfollow/${userId}`
+      : `http://localhost:8080/api/users/${currentUser.id}/follow/${userId}`;
+
+    axios.post(endpoint, {}, { withCredentials: true })
+      .then(() => setIsFollowed(prev => !prev))
+      .catch(err => console.error("Error toggling follow status:", err));
   };
 
   return (
@@ -57,9 +75,9 @@ const Profile = () => {
           className="profilePic"
         />
       </div>
+
       <div className="profileContainer">
         <div className="uInfo">
-          
           <div className="center">
             <h2>{user?.name}</h2>
             <div className="info">
@@ -74,12 +92,13 @@ const Profile = () => {
                   <button onClick={() => setOpenCreatePost(true)}>Create Post</button>
                 </>
               ) : (
-                <button onClick={handleFollow}>
-                  {isFollowing ? "Following" : "Follow"}
+                <button onClick={handleFollowToggle}>
+                  {isFollowed ? "Unfollow" : "Follow"}
                 </button>
               )}
             </div>
           </div>
+
           <div className="left">
             <a href="http://facebook.com"><FacebookTwoTone fontSize="large" /></a>
             <a href="http://instagram.com"><Instagram fontSize="large" /></a>
@@ -87,17 +106,16 @@ const Profile = () => {
             <a href="http://linkedin.com"><LinkedIn fontSize="large" /></a>
             <a href="http://pinterest.com"><Pinterest fontSize="large" /></a>
           </div>
-          <div className="right">
-          </div>
+
+          <div className="right" />
         </div>
-        
+
         <Posts userId={userId} />
       </div>
 
       {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={currentUser} />}
       {openCreatePost && <CreatePost setOpenCreatePost={setOpenCreatePost} userId={currentUser.id} />}
     </div>
-    
   );
 };
 

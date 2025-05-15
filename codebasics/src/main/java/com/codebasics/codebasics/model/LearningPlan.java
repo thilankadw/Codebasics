@@ -14,6 +14,22 @@ public class LearningPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "owner_id")
+    private Long ownerId;
+
+    @Column(nullable = false, unique = true)
+    private String planName;
+
+    @Column(nullable = false)
+    private String description;
+
+    private String skills;
+
+    @Column(nullable = false)
+    private String duration;
+
+    private String imageUrl;
+
     public Long getId() {
         return id;
     }
@@ -22,11 +38,11 @@ public class LearningPlan {
         this.id = id;
     }
 
-    public User getOwnerId() {
+    public Long getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(User ownerId) {
+    public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
     }
 
@@ -69,20 +85,4 @@ public class LearningPlan {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    private User ownerId;
-
-    @Column(nullable = false, unique = true)
-    private String planName;
-
-    @Column(nullable = false)
-    private String description;
-
-    private String skills;
-
-    @Column(nullable = false)
-    private String duration;
-
-    private String imageUrl;
 }
