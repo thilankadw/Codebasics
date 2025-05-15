@@ -1,22 +1,41 @@
-import React, { useContext, useState } from 'react';
-import LearningPlanPhaseForm from './LearningPlanPhaseForm';
+import React, { useContext, useState, useEffect } from 'react';
 import './LearningPlanForm.scss';
-import { AuthContext } from '../../context/authContext';
+import EditLearningPlanPhaseForm from './EditLearningPlanPhaseForm';
+import { AuthContext } from '../../../context/authContext';
 
-const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
+const EditLearningPlanForm = ({ initialData = {}, onSubmit, isEdit }) => {
     const { currentUser } = useContext(AuthContext);
 
     const [learningPlan, setLearningPlan] = useState({
-        planName: initialData.planName || '',
-        description: initialData.description || '',
-        skills: initialData.skills || '',
-        duration: initialData.duration || '',
+        planName: '',
+        description: '',
+        skills: '',
+        duration: '',
         imageUrl: "https://res.cloudinary.com/dddahxznm/image/upload/v1745643813/web_developer_illustrator_1_dowg5x.jpg",
-        ownerId: currentUser.id || 1,
-        phases: initialData.phases || []
+        ownerId: currentUser?.id || 1,
+        phases: []
     });
 
     const [errors, setErrors] = useState({});
+
+    useEffect(() => {
+        if (initialData && Object.keys(initialData).length > 0) {
+            setLearningPlan({
+                id: initialData.id,
+                planName: initialData.planName || '',
+                description: initialData.description || '',
+                skills: initialData.skills || '',
+                duration: initialData.duration || '',
+                imageUrl: initialData.imageUrl || "https://res.cloudinary.com/dddahxznm/image/upload/v1745643813/web_developer_illustrator_1_dowg5x.jpg",
+                ownerId: initialData.ownerId || currentUser?.id || 1,
+                phases: initialData.phases?.map(phase => ({
+                    ...phase,
+                    id: phase.id, 
+                    imageUrl: phase.imageUrl || "https://res.cloudinary.com/dddahxznm/image/upload/v1745645090/programming-background-collage_lotbxs.jpg"
+                })) || []
+            });
+        }
+    }, [initialData, currentUser]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -93,7 +112,7 @@ const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
     return (
         <form onSubmit={handleSubmit} className="learning-plan-form">
             <div className="form-header">
-                <h2>Create New Learning Plan</h2>
+                <h2>{isEdit ? 'Update Learning Plan' : 'Create Learning Plan'}</h2>
             </div>
 
             <div className="form-grid">
@@ -144,22 +163,29 @@ const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
                     />
                 </div>
 
-                {/* <div className="form-group full-width">
+                <div className="form-group full-width">
                     <label>Upload Image</label>
                     <input
                         type="file"
                         accept="image/*"
                         onChange={handleFileChange}
                     />
-                    {learningPlan.imageFile && (
+                    {/* {learningPlan.imageFile ? (
                         <div className="image-preview">
                             <img
                                 src={URL.createObjectURL(learningPlan.imageFile)}
                                 alt="Preview"
                             />
                         </div>
-                    )}
-                </div> */}
+                    ) : learningPlan.imageUrl && (
+                        <div className="image-preview">
+                            <img
+                                src={learningPlan.imageUrl}
+                                alt="Current Image"
+                            />
+                        </div>
+                    )} */}
+                </div>
             </div>
 
             <div className="phases-section">
@@ -184,7 +210,7 @@ const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
                                         &times;
                                     </button>
                                 </div>
-                                <LearningPlanPhaseForm
+                                <EditLearningPlanPhaseForm
                                     phase={phase}
                                     onChange={(updatedPhase) => handlePhaseChange(index, updatedPhase)}
                                 />
@@ -197,11 +223,11 @@ const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
 
             <div className="form-actions">
                 <button type="submit" className="submit-btn">
-                    {initialData.id ? 'Update Plan' : 'Create Plan'}
+                    {isEdit ? 'Update Plan' : 'Create Plan'}
                 </button>
             </div>
         </form>
     );
 };
 
-export default LearningPlanForm;
+export default EditLearningPlanForm;

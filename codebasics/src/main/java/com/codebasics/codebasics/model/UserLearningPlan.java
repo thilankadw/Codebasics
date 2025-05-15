@@ -1,9 +1,13 @@
 package com.codebasics.codebasics.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user_learning_plans")
@@ -37,10 +41,12 @@ public class UserLearningPlan {
 
     @ManyToOne
     @JoinColumn(name = "actual_owner_id")
+    @JsonBackReference
     private User actualOwner;
 
     @ManyToOne
     @JoinColumn(name = "current_owner_id")
+    @JsonBackReference
     private User currentOwner;
 
     @Pattern(regexp = "^(PRIVATE|PUBLIC)$", message = "Visibility must be either PRIVATE or PUBLIC")
@@ -49,16 +55,26 @@ public class UserLearningPlan {
     @Column(name = "original_plan_id")
     private Long originalPlanId;
 
-    @Pattern(regexp = "^(complete|incomplete)$", message = "Milestone status must be either complete or incomplete")
-    private String milestone1;
+    @Column(name = "learning_plan_id", nullable = false)
+    private Long learningPlanId;
 
-    @Pattern(regexp = "^(complete|incomplete)$", message = "Milestone status must be either complete or incomplete")
-    private String milestone2;
+    @Pattern(regexp = "^(NOT_STARTED|IN_PROGRESS|COMPLETED)$",
+            message = "Overall status must be one of: NOT_STARTED, IN_PROGRESS, COMPLETED")
+    @Column(name = "overall_status", nullable = false)
+    private String overallStatus = "NOT_STARTED";
 
-    @Pattern(regexp = "^(complete|incomplete)$", message = "Milestone status must be either complete or incomplete")
-    private String milestone3;
+    @Column(name = "subscription_date", nullable = true)
+    private LocalDateTime subscriptionDate;
 
-    // Getters and Setters
+    @Column(name = "completion_date", nullable = true)
+    private LocalDateTime completionDate;
+
+    @Column(name = "last_activity_date")
+    private LocalDateTime lastActivityDate;
+
+    @OneToMany(mappedBy = "userLearningPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserLearningPhaseProgress> phaseProgresses = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
@@ -139,27 +155,101 @@ public class UserLearningPlan {
         this.originalPlanId = originalPlanId;
     }
 
-    public String getMilestone1() {
-        return milestone1;
+    public Long getLearningPlanId() {
+        return learningPlanId;
     }
 
-    public void setMilestone1(String milestone1) {
-        this.milestone1 = milestone1;
+    public void setLearningPlanId(Long learningPlanId) {
+        this.learningPlanId = learningPlanId;
     }
 
-    public String getMilestone2() {
-        return milestone2;
+    public String getOverallStatus() {
+        return overallStatus;
     }
 
-    public void setMilestone2(String milestone2) {
-        this.milestone2 = milestone2;
+    public void setOverallStatus(String overallStatus) {
+        this.overallStatus = overallStatus;
+        this.lastActivityDate = LocalDateTime.now();
+
+        if ("COMPLETED".equals(overallStatus)) {
+            this.completionDate = LocalDateTime.now();
+        }
     }
 
-    public String getMilestone3() {
-        return milestone3;
+    public LocalDateTime getSubscriptionDate() {
+        return subscriptionDate;
     }
 
-    public void setMilestone3(String milestone3) {
-        this.milestone3 = milestone3;
+    public void setSubscriptionDate(LocalDateTime subscriptionDate) {
+        this.subscriptionDate = subscriptionDate;
+    }
+
+    public LocalDateTime getCompletionDate() {
+        return completionDate;
+    }
+
+    public void setCompletionDate(LocalDateTime completionDate) {
+        this.completionDate = completionDate;
+    }
+
+    public LocalDateTime getLastActivityDate() {
+        return lastActivityDate;
+    }
+
+    public void setLastActivityDate(LocalDateTime lastActivityDate) {
+        this.lastActivityDate = lastActivityDate;
+    }
+
+    public List<UserLearningPhaseProgress> getPhaseProgresses() {
+        return phaseProgresses;
+    }
+
+    public void setPhaseProgresses(List<UserLearningPhaseProgress> phaseProgresses) {
+        this.phaseProgresses = phaseProgresses;
+    }
+
+    public void addPhaseProgress(UserLearningPhaseProgress progress) {
+        phaseProgresses.add(progress);
+        progress.setUserLearningPlan(this);
+    }
+
+    public void removePhaseProgress(UserLearningPhaseProgress progress) {
+        phaseProgresses.remove(progress);
+        progress.setUserLearningPlan(null);
+    }
+
+    public double calculateOverallProgressPercentage() {
+        if (phaseProgresses.isEmpty()) {
+            return 0.0;
+        }
+
+        long completedPhases = phaseProgresses.stream()
+                .filter(phase -> "COMPLETED".equals(phase.getStatus()))
+                .count();
+
+        return (double) completedPhases / phaseProgresses.size() * 100.0;
+    }
+
+    public void updateOverallStatus() {
+        if (phaseProgresses.isEmpty()) {
+            setOverallStatus("NOT_STARTED");
+            return;
+        }
+
+        long completedPhases = phaseProgresses.stream()
+                .filter(phase -> "COMPLETED".equals(phase.getStatus()))
+                .count();
+
+        long inProgressPhases = phaseProgresses.stream()
+                .filter(phase -> "IN_PROGRESS".equals(phase.getStatus()))
+                .count();
+
+        if (completedPhases == phaseProgresses.size()) {
+            setOverallStatus("COMPLETED");
+        } else if (completedPhases > 0 || inProgressPhases > 0) {
+            setOverallStatus("IN_PROGRESS");
+        } else {
+            setOverallStatus("NOT_STARTED");
+        }
     }
 }

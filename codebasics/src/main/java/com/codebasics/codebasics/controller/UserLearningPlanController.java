@@ -1,6 +1,9 @@
 package com.codebasics.codebasics.controller;
 
+import com.codebasics.codebasics.dto.UpdatePlanRequestDTO;
 import com.codebasics.codebasics.model.UserLearningPlan;
+import com.codebasics.codebasics.model.UserLearningPhaseProgress;
+import com.codebasics.codebasics.model.LearningPlanPhase;
 import com.codebasics.codebasics.dto.UserLearningPlanDto;
 import com.codebasics.codebasics.service.UserLearningPlanService;
 import jakarta.validation.Valid;
@@ -8,30 +11,37 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-//@CrossOrigin(origins = "http://localhost:3000")
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Map;
+
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/user-learning-plans")
 public class UserLearningPlanController {
 
     private final UserLearningPlanService userLearningPlanService;
 
-    public UserLearningPlanController(UserLearningPlanService userLearningPlanService) {
+    public UserLearningPlanController(
+            UserLearningPlanService userLearningPlanService) {
         this.userLearningPlanService = userLearningPlanService;
     }
 
     @GetMapping
-    public List<UserLearningPlan> getAllPlans() {
-        return userLearningPlanService.getAllPlans();
+    public List<UserLearningPlanDto> getAllPlans() {
+        return userLearningPlanService.getAllPlans()
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserLearningPlan> getPlanById(@PathVariable Long id) {
+    public ResponseEntity<UserLearningPlanDto> getPlanById(@PathVariable Long id) {
         UserLearningPlan plan = userLearningPlanService.getPlanById(id);
-        return ResponseEntity.ok(plan);
+        UserLearningPlanDto dto = convertToDto(plan);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/subscribe")
@@ -55,29 +65,58 @@ public class UserLearningPlanController {
         dto.setCurrentOwnerId(plan.getCurrentOwner() != null ? plan.getCurrentOwner().getId() : null);
         dto.setVisibility(plan.getVisibility());
         dto.setOriginalPlanId(plan.getOriginalPlanId());
-        dto.setMilestone1(plan.getMilestone1());
-        dto.setMilestone2(plan.getMilestone2());
-        dto.setMilestone3(plan.getMilestone3());
+        dto.setLearningPlanId(plan.getLearningPlanId());
+        dto.setOverallStatus(plan.getOverallStatus());
+        dto.setSubscriptionDate(plan.getSubscriptionDate());
+        dto.setCompletionDate(plan.getCompletionDate());
+        dto.setLastActivityDate(plan.getLastActivityDate());
+        dto.setProgressPercentage(plan.calculateOverallProgressPercentage());
+
+        // Convert phase progresses to DTOs
+        List<UserLearningPlanDto.PhaseProgressDto> phaseProgressDtos = plan.getPhaseProgresses().stream()
+                .map(progress -> {
+                    UserLearningPlanDto.PhaseProgressDto progressDto = new UserLearningPlanDto.PhaseProgressDto();
+                    progressDto.setId(progress.getId());
+                    progressDto.setPhaseId(progress.getLearningPlanPhaseId());
+                    progressDto.setStatus(progress.getStatus());
+                    progressDto.setCompletionDate(progress.getCompletionDate());
+                    progressDto.setLastUpdated(progress.getLastUpdated());
+
+                    // Optionally fetch additional phase details if needed
+//                    try {
+//                        LearningPlanPhase phase = learningPlanPhaseService.getPhaseById(progress.getLearningPlanPhaseId());
+//                        progressDto.setTopic(phase.getTopic());
+//                        progressDto.setSkill(phase.getSkill());
+//                        progressDto.setPhaseDescription(phase.getDescription());
+//                        progressDto.setPhaseDuration(phase.getDuration());
+//                    } catch (Exception e) {
+//                        // Handle case where phase might not exist anymore
+//                    }
+
+                    return progressDto;
+                })
+                .collect(Collectors.toList());
+
+        dto.setPhaseProgresses(phaseProgressDtos);
+
         return dto;
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePlan(@PathVariable Long id, @Valid @RequestBody UserLearningPlan plan,
-            BindingResult bindingResult) {
+    public ResponseEntity<?> updatePlan(@PathVariable Long id, @Valid @RequestBody UpdatePlanRequestDTO request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            Map<String, String> errors = bindingResult.getFieldErrors().stream()
-                    .collect(Collectors.toMap(
-                            fieldError -> fieldError.getField(),
-                            fieldError -> fieldError.getDefaultMessage()));
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage()));
             return ResponseEntity.badRequest().body(errors);
         }
 
         try {
-            UserLearningPlan updatedPlan = userLearningPlanService.updatePlan(id, plan);
-            return ResponseEntity.ok(updatedPlan);
+            UserLearningPlan updatedPlan = userLearningPlanService.updatePlan(id, request);
+            UserLearningPlanDto dto = convertToDto(updatedPlan);
+            return ResponseEntity.ok(dto);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -88,37 +127,63 @@ public class UserLearningPlanController {
     }
 
     @GetMapping("/owner/{ownerId}")
-    public List<UserLearningPlan> getPlansByOwner(@PathVariable Long ownerId) {
-        return userLearningPlanService.getPlansByOwner(ownerId);
+    public List<UserLearningPlanDto> getPlansByOwner(@PathVariable Long ownerId) {
+        return userLearningPlanService.getPlansByOwner(ownerId)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/current-owner/{currentOwnerId}")
-    public List<UserLearningPlan> getPlansByCurrentOwner(@PathVariable Long currentOwnerId) {
-        return userLearningPlanService.getPlansByCurrentOwner(currentOwnerId);
+    public List<UserLearningPlanDto> getPlansByCurrentOwner(@PathVariable Long currentOwnerId) {
+        return userLearningPlanService.getPlansByCurrentOwner(currentOwnerId)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/visibility/{visibility}")
-    public List<UserLearningPlan> getPlansByVisibility(@PathVariable String visibility) {
-        return userLearningPlanService.getPlansByVisibility(visibility);
-    }
-
-    @GetMapping("/current-owner/{currentOwnerId}/visibility/{visibility}")
-    public List<UserLearningPlan> getPlansByCurrentOwnerAndVisibility(
-            @PathVariable Long currentOwnerId,
-            @PathVariable String visibility) {
-        return userLearningPlanService.getPlansByCurrentOwnerAndVisibility(currentOwnerId, visibility);
+    public List<UserLearningPlanDto> getPlansByVisibility(@PathVariable String visibility) {
+        return userLearningPlanService.getPlansByVisibility(visibility)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @PutMapping("/share/{id}")
-    public ResponseEntity<UserLearningPlan> sharePlan(
-            @PathVariable Long id,
-            @RequestParam String visibility,
-            @RequestParam(required = false) Long recipientId) {
-        try {
-            UserLearningPlan updatedPlan = userLearningPlanService.updateVisibility(id, visibility);
-            return ResponseEntity.ok(updatedPlan);
-        } catch (Exception e) {
+    public ResponseEntity<UserLearningPlanDto> sharePlan(@PathVariable Long id, @RequestBody Map<String, String> visibilityUpdate) {
+        String visibility = visibilityUpdate.get("visibility");
+        UserLearningPlan updatedPlan = userLearningPlanService.updateVisibility(id, visibility);
+        UserLearningPlanDto dto = convertToDto(updatedPlan);
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{planId}/progress")
+    public ResponseEntity<Double> getPlanProgress(@PathVariable Long planId) {
+        double progress = userLearningPlanService.calculatePlanProgressPercentage(planId);
+        return ResponseEntity.ok(progress);
+    }
+
+    @GetMapping("/{planId}/phases")
+    public ResponseEntity<List<UserLearningPlanDto.PhaseProgressDto>> getPlanPhases(@PathVariable Long planId) {
+        UserLearningPlan plan = userLearningPlanService.getPlanById(planId);
+        UserLearningPlanDto dto = convertToDto(plan);
+        return ResponseEntity.ok(dto.getPhaseProgresses());
+    }
+
+    @PutMapping("/{planId}/phases/{phaseId}/status")
+    public ResponseEntity<UserLearningPlanDto> updatePhaseStatus(
+            @PathVariable Long planId,
+            @PathVariable Long phaseId,
+            @RequestBody Map<String, String> statusUpdate) {
+
+        String status = statusUpdate.get("status");
+        if (status == null || !status.matches("^(NOT_STARTED|IN_PROGRESS|COMPLETED)$")) {
             return ResponseEntity.badRequest().build();
         }
+
+        UserLearningPlan updatedPlan = userLearningPlanService.updatePhaseProgress(planId, phaseId, status);
+        UserLearningPlanDto dto = convertToDto(updatedPlan);
+        return ResponseEntity.ok(dto);
     }
 }

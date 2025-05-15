@@ -1,50 +1,21 @@
-package com.codebasics.codebasics.model;
+package com.codebasics.codebasics.dto;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
 
-@Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class LearningPlan {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "owner_id")
-    private Long ownerId;
-
-    @Column(nullable = false, unique = true)
+public class UpdatePlanRequestDTO {
+    @NotBlank(message = "Plan name is required")
     private String planName;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Description is required")
     private String description;
 
+    @NotBlank(message = "Skills are required")
     private String skills;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Duration is required")
     private String duration;
 
     private String imageUrl;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
-    }
 
     public String getPlanName() {
         return planName;
