@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './LearningPlanPhaseForm.scss';
 import { toast } from 'react-toastify';
 
-const LearningPlanPhaseForm = ({ phase, onChange }) => {
+const EditLearningPlanPhaseForm = ({ phase, onChange }) => {
     const [uploading, setUploading] = useState(false);
 
     const handleImageUpload = async (file) => {
@@ -33,7 +33,10 @@ const LearningPlanPhaseForm = ({ phase, onChange }) => {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        onChange({ ...phase, imageFile: file });
+        if (file) {
+            onChange({ ...phase, imageFile: file });
+            handleImageUpload(file);
+        }
     };
 
     return (
@@ -66,9 +69,14 @@ const LearningPlanPhaseForm = ({ phase, onChange }) => {
             {/* <div className="form-group">
                 <label>Upload Image</label>
                 <input type="file" accept="image/*" onChange={handleFileChange} />
-                {phase.imageFile && (
+                {uploading && <div className="upload-status">Uploading image...</div>}
+                {phase.imageFile ? (
                     <div className="image-preview">
                         <img src={URL.createObjectURL(phase.imageFile)} alt="Phase Preview" />
+                    </div>
+                ) : phase.imageUrl && (
+                    <div className="image-preview">
+                        <img src={phase.imageUrl} alt="Phase Image" />
                     </div>
                 )}
             </div> */}
@@ -76,4 +84,4 @@ const LearningPlanPhaseForm = ({ phase, onChange }) => {
     );
 };
 
-export default LearningPlanPhaseForm;
+export default EditLearningPlanPhaseForm;

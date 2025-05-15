@@ -1,16 +1,18 @@
 package com.codebasics.codebasics.repository;
 
+import com.codebasics.codebasics.model.User;
 import com.codebasics.codebasics.model.UserLearningPlan;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
+@Repository
 public interface UserLearningPlanRepository extends JpaRepository<UserLearningPlan, Long> {
-    List<UserLearningPlan> findByActualOwnerId(Long actualOwnerId);
-
-    List<UserLearningPlan> findByCurrentOwnerId(Long currentOwnerId);
-
     List<UserLearningPlan> findByVisibility(String visibility);
-
-    List<UserLearningPlan> findByCurrentOwnerIdAndVisibility(Long currentOwnerId, String visibility);
-
+    List<UserLearningPlan> findByActualOwner(User actualOwner);
+    List<UserLearningPlan> findByCurrentOwner(User currentOwner);
+    List<UserLearningPlan> findByOriginalPlanId(Long originalPlanId);
+    List<UserLearningPlan> findByLearningPlanId(Long learningPlanId);
+    List<UserLearningPlan> findByOverallStatus(String overallStatus);
 }
