@@ -18,6 +18,7 @@ const Comments = ({ postId }) => {
   const [likeCount, setLikeCount] = useState(0);
   const [editingId, setEditingId] = useState(null);
   const [editingContent, setEditingContent] = useState("");
+  const [userInfos, setUserInfos] = useState({});
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
@@ -29,9 +30,23 @@ const Comments = ({ postId }) => {
     try {
       const res = await axios.get(`http://localhost:8080/api/post-reaction/post/${postId}/comments`);
       setComments(res.data);
-      console.log(res.data);
+
+      // Extract unique userIds and fetch user info
+      const userIds = [...new Set(res.data.map((comment) => comment.userId))];
+      userIds.forEach(fetchUserInfo);
     } catch (err) {
       console.error("Failed to fetch comments:", err);
+    }
+  };
+
+  const fetchUserInfo = async (userId) => {
+    if (userInfos[userId]) return; // Skip if already fetched
+
+    try {
+      const res = await axios.get(`http://localhost:8080/api/auth/users/${userId}`);
+      setUserInfos((prev) => ({ ...prev, [userId]: res.data }));
+    } catch (err) {
+      console.error(`Failed to fetch user info for userId ${userId}:`, err);
     }
   };
 
@@ -104,7 +119,6 @@ const Comments = ({ postId }) => {
     try {
       await axios.delete(`http://localhost:8080/api/post-reaction/delete-post-interaction/${id}`);
       fetchComments();
-      console.log(id);
     } catch (err) {
       console.error("Failed to delete comment:", err);
     }
@@ -113,7 +127,14 @@ const Comments = ({ postId }) => {
   return (
     <div className="comments">
       <div className="write">
-        <img src={currentUser.profilePic || "/default.png"} alt="profile" />
+        <img
+          src={
+            currentUser.profilePic
+              ? `http://localhost:8080/uploads/${currentUser.profilePic}`
+              : "/default.png"
+          }
+          alt="profile"
+        />
         <input
           type="text"
           placeholder="Write a comment..."
@@ -129,17 +150,22 @@ const Comments = ({ postId }) => {
 
       {comments.map((comment) => (
         <div className="comment" key={comment.id}>
-          <img src={"/default.png"} alt="user" />
+          <img
+            src={
+              userInfos[comment.userId]?.profilePic
+                ? `http://localhost:8080/uploads/${userInfos[comment.userId].profilePic}`
+                : "/default.png"
+            }
+            alt="user"
+          />
           <div className="info">
-            <span>User ID: {comment.userId}</span>
+            <span>{userInfos[comment.userId]?.username || "Loading..."}</span>
             {editingId === comment.id ? (
-              <>
-                <input
-                  type="text"
-                  value={editingContent}
-                  onChange={(e) => setEditingContent(e.target.value)}
-                />
-              </>
+              <input
+                type="text"
+                value={editingContent}
+                onChange={(e) => setEditingContent(e.target.value)}
+              />
             ) : (
               <p>{comment.content}</p>
             )}

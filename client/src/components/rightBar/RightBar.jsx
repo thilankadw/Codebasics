@@ -67,7 +67,7 @@ const RightBar = ({ currentUserId }) => {
         {/* Suggestions */}
         <div className="item">
           <span>Suggestions For You</span>
-          {suggestions.map((user) => (
+          {suggestions.slice(0, 6).map((user) => (
             <div className="user" key={user.id}>
               <div className="userInfo">
                 <Link
@@ -77,11 +77,11 @@ const RightBar = ({ currentUserId }) => {
                 >
                   <img
                     src={
-                      currentUser.profilePic
-                        ? currentUser.profilePic.startsWith("https://")
-                          ? currentUser.profilePic
-                          : `http://localhost:8080/uploads/${currentUser.profilePic}`
-                        : Profilepicture
+                      user.profilePic
+                        ? user.profilePic.startsWith("https://")
+                          ? user.profilePic
+                          : `http://localhost:8080/uploads/${user.profilePic}`
+                        : user.profilePics
                     }
                     alt=""
                   />
@@ -107,7 +107,7 @@ const RightBar = ({ currentUserId }) => {
         {/* Online Friends */}
         <div className="item">
           <span>Online Friends</span>
-          {onlineFriends.map((user) => (
+          {onlineFriends.slice(0, 6).map((user) => (
             <div className="user" key={user.id}>
               <div className="userInfo">
                 <Link
@@ -139,7 +139,7 @@ const RightBar = ({ currentUserId }) => {
         {/* Friend List */}
         <div className="item">
           <span>Your Friends</span>
-          {friendList.map((user) => (
+          {friendList.slice(0, 6).map((user) => (
             <div className="user" key={user.id}>
               <div className="userInfo">
                 <Link

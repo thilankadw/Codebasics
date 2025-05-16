@@ -75,10 +75,10 @@ const Post = ({ post }) => {
           <div className="userInfo">
             <img
               src={
-                          currentUser.profilePic
-                            ? currentUser.profilePic.startsWith("https://")
-                              ? currentUser.profilePic
-                              : `http://localhost:8080/uploads/${currentUser.profilePic}`
+                post.user.profilePic
+                            ? post.user.profilePic.startsWith("https://")
+                              ? post.user.profilePic
+                              : `http://localhost:8080/uploads/${post.user?.profilePic}`
                             : Profilepicture
                         }
               alt="User"

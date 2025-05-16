@@ -16,7 +16,7 @@ const Posts = ({ userId }) => {
       try {
         let res;
         if (userId) {
-          res = await axios.get(`http://localhost:8080/api/posts/user/${currentUser.id}`);
+          res = await axios.get(`http://localhost:8080/api/posts/user/${userId}`);
         } else {
           res = await axios.get(`http://localhost:8080/api/posts`);
         }
