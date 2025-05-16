@@ -2,6 +2,7 @@ package com.codebasics.codebasics.service;
 
 import com.codebasics.codebasics.dto.LearningPlanDTO;
 import com.codebasics.codebasics.dto.LearningPlanPhaseDTO;
+import com.codebasics.codebasics.dto.NotificationDTO;
 import com.codebasics.codebasics.model.LearningPlan;
 import com.codebasics.codebasics.model.LearningPlanPhase;
 import com.codebasics.codebasics.model.User;
@@ -13,6 +14,7 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +36,9 @@ public class LearningPlanService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @PostConstruct
     public void configureModelMapper() {
@@ -61,9 +66,14 @@ public class LearningPlanService {
             learningPlanPhaseRepository.saveAll(phases);
         }
 
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(learningPlanDTO.getOwnerId());
+        notificationDTO.setType("PLAN_ADDED");
+        notificationDTO.setMessage("You have created a new learning plan: " + learningPlan.getPlanName());
+        notificationService.createNotification(notificationDTO);
+
         return getLearningPlanWithPhases(learningPlan.getId());
     }
-
 
     public List<LearningPlanDTO> getAllLearningPlans() {
         List<LearningPlan> learningPlans = learningPlanRepository.findAll();
@@ -96,6 +106,12 @@ public class LearningPlanService {
             learningPlanPhaseRepository.saveAll(phases);
         }
 
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(learningPlan.getOwnerId());
+        notificationDTO.setType("PLAN_UPDATED");
+        notificationDTO.setMessage("Your learning plan \"" + learningPlan.getPlanName() + "\" has been updated.");
+        notificationService.createNotification(notificationDTO);
+
         return getLearningPlanWithPhases(id);
     }
 
@@ -109,6 +125,12 @@ public class LearningPlanService {
         LearningPlan learningPlan = existingPlan.get();
 
         learningPlanRepository.deleteById(id);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(learningPlan.getOwnerId());
+        notificationDTO.setType("PLAN_DELETED");
+        notificationDTO.setMessage("Your learning plan \"" + learningPlan.getPlanName() + "\" has been deleted.");
+        notificationService.createNotification(notificationDTO);
 
         return modelMapper.map(learningPlan, LearningPlanDTO.class);
     }

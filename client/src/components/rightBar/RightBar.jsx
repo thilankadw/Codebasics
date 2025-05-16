@@ -3,6 +3,7 @@ import axios from "axios";
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import { Link } from "react-router-dom";
+import Profilepicture from "../../assets/profilepic.png";
 
 const RightBar = ({ currentUserId }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -72,12 +73,15 @@ const RightBar = ({ currentUserId }) => {
                 <Link
                   to={`/profile/${user.id}`}
                   style={{ textDecoration: "none", color: "inherit" }}
+                  className="foloowuserprofile"
                 >
                   <img
                     src={
-                      user.profilePic
-                        ? `http://localhost:8080/uploads/${user.profilePic}`
-                        : "https://via.placeholder.com/50"
+                      currentUser.profilePic
+                        ? currentUser.profilePic.startsWith("https://")
+                          ? currentUser.profilePic
+                          : `http://localhost:8080/uploads/${currentUser.profilePic}`
+                        : Profilepicture
                     }
                     alt=""
                   />

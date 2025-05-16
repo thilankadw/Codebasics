@@ -1,8 +1,10 @@
 package com.codebasics.codebasics.service;
 
+import com.codebasics.codebasics.dto.NotificationDTO;
 import com.codebasics.codebasics.dto.UpdatePlanRequestDTO;
 import com.codebasics.codebasics.model.*;
 import com.codebasics.codebasics.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,17 +20,20 @@ public class UserLearningPlanService {
     private final UserRepository userRepository;
     private final UserLearningPhaseProgressRepository userLearningPhaseProgressRepository;
 
+    private final NotificationService notificationService;
+
     public UserLearningPlanService(
             UserLearningPlanRepository userLearningPlanRepository,
             LearningPlanRepository learningPlanRepository,
             LearningPlanPhaseRepository learningPlanPhaseRepository,
             UserRepository userRepository,
-            UserLearningPhaseProgressRepository userLearningPhaseProgressRepository) {
+            UserLearningPhaseProgressRepository userLearningPhaseProgressRepository, NotificationService notificationService) {
         this.userLearningPlanRepository = userLearningPlanRepository;
         this.learningPlanRepository = learningPlanRepository;
         this.learningPlanPhaseRepository = learningPlanPhaseRepository;
         this.userRepository = userRepository;
         this.userLearningPhaseProgressRepository = userLearningPhaseProgressRepository;
+        this.notificationService = notificationService;
     }
 
     public List<UserLearningPlan> getAllPlans() {
@@ -80,7 +85,15 @@ public class UserLearningPlanService {
             savedPlan.addPhaseProgress(progress);
         }
 
-        return userLearningPlanRepository.save(savedPlan);
+        UserLearningPlan finalPlan = userLearningPlanRepository.save(savedPlan);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(actualOwner.getId());
+        notificationDTO.setType("PLAN_SUBSCRIBED");
+        notificationDTO.setMessage(user.getUsername() + " subscribed to your learning plan: " + finalPlan.getPlanName());
+        notificationService.createNotification(notificationDTO);
+
+        return finalPlan;
     }
 
     @Transactional
@@ -95,12 +108,29 @@ public class UserLearningPlanService {
         plan.setImageUrl(request.getImageUrl() != null ? request.getImageUrl().trim() : "");
         plan.setLastActivityDate(LocalDateTime.now());
 
-        return userLearningPlanRepository.save(plan);
+        UserLearningPlan updatedPlan = userLearningPlanRepository.save(plan);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(updatedPlan.getActualOwner().getId());
+        notificationDTO.setType("PLAN_UPDATED");
+        notificationDTO.setMessage("Your learning plan '" + updatedPlan.getPlanName() + "' was updated.");
+        notificationService.createNotification(notificationDTO);
+
+        return updatedPlan;
     }
 
     public void deletePlan(Long id) {
         UserLearningPlan plan = getPlanById(id);
+        Long ownerId = plan.getActualOwner().getId();
+        String planName = plan.getPlanName();
+
         userLearningPlanRepository.delete(plan);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(ownerId);
+        notificationDTO.setType("PLAN_DELETED");
+        notificationDTO.setMessage("Your learning plan '" + planName + "' was deleted.");
+        notificationService.createNotification(notificationDTO);
     }
 
     public List<UserLearningPlan> getPlansByOwner(Long ownerId) {
@@ -125,7 +155,16 @@ public class UserLearningPlanService {
 
         plan.setVisibility(visibility);
         plan.setLastActivityDate(LocalDateTime.now());
-        return userLearningPlanRepository.save(plan);
+
+        UserLearningPlan updatedPlan = userLearningPlanRepository.save(plan);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(updatedPlan.getActualOwner().getId());
+        notificationDTO.setType("PLAN_VISIBILITY_UPDATED");
+        notificationDTO.setMessage("Visibility for your learning plan '" + updatedPlan.getPlanName() + "' changed to " + visibility);
+        notificationService.createNotification(notificationDTO);
+
+        return updatedPlan;
     }
 
     @Transactional
@@ -143,7 +182,15 @@ public class UserLearningPlanService {
         plan.updateOverallStatus();
         plan.setLastActivityDate(LocalDateTime.now());
 
-        return userLearningPlanRepository.save(plan);
+        UserLearningPlan updatedPlan = userLearningPlanRepository.save(plan);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(updatedPlan.getActualOwner().getId());
+        notificationDTO.setType("PHASE_PROGRESS_UPDATED");
+        notificationDTO.setMessage("Phase progress updated to '" + status + "' for your learning plan '" + updatedPlan.getPlanName() + "'.");
+        notificationService.createNotification(notificationDTO);
+
+        return updatedPlan;
     }
 
     public List<UserLearningPhaseProgress> getPhaseProgressesByPlanId(Long planId) {

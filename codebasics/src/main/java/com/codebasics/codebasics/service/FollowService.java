@@ -1,5 +1,6 @@
 package com.codebasics.codebasics.service;
 
+import com.codebasics.codebasics.dto.NotificationDTO;
 import com.codebasics.codebasics.model.User;
 import com.codebasics.codebasics.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +15,21 @@ public class FollowService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public void followUser(Long followerId, Long followingId) {
         User follower = userRepository.findById(followerId).orElseThrow();
         User following = userRepository.findById(followingId).orElseThrow();
 
         follower.getFollowing().add(following);
         userRepository.save(follower);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(followingId);
+        notificationDTO.setType("USER_FOLLOWED");
+        notificationDTO.setMessage(follower.getUsername() + " started following you.");
+        notificationService.createNotification(notificationDTO);
     }
 
     public void unfollowUser(Long followerId, Long followingId) {
@@ -28,6 +38,12 @@ public class FollowService {
 
         follower.getFollowing().remove(following);
         userRepository.save(follower);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(followingId);
+        notificationDTO.setType("USER_UNFOLLOWED");
+        notificationDTO.setMessage(follower.getUsername() + " has unfollowed you.");
+        notificationService.createNotification(notificationDTO);
     }
 
     public Set<User> getFollowers(Long userId) {

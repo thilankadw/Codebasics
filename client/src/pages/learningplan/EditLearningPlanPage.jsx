@@ -27,6 +27,7 @@ const EditLearningPlanPage = () => {
                             withCredentials: true
                         }
                     );
+                    console.log(response)
                     setLearningPlanData(response.data);
                 }
             } catch (err) {
@@ -54,11 +55,24 @@ const EditLearningPlanPage = () => {
     const handleSubmit = async (learningPlan) => {
         try {
             let response;
-            
+
+            console.log(learningPlan)
+
+            const cleanedPlan = {
+                ...learningPlan,
+                phases: learningPlan.phases.map(phase => {
+                    const {
+                        id,
+                        ...rest
+                    } = phase;
+                    return rest;
+                })
+            };
+
             if (id) {
                 response = await axios.put(
                     `http://localhost:8080/api/learning-plan/update-learning-plan/${id}`,
-                    learningPlan,
+                    cleanedPlan,
                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -67,7 +81,7 @@ const EditLearningPlanPage = () => {
                         withCredentials: true
                     }
                 );
-                
+
                 toast.success('Learning plan updated successfully.', {
                     position: "top-right",
                     autoClose: 5000,
@@ -91,7 +105,7 @@ const EditLearningPlanPage = () => {
                         withCredentials: true
                     }
                 );
-                
+
                 toast.success('Learning plan created successfully.', {
                     position: "top-right",
                     autoClose: 5000,
@@ -133,9 +147,9 @@ const EditLearningPlanPage = () => {
 
     return (
         <div className="edit-learning-plan-page">
-            <EditLearningPlanForm 
-                initialData={learningPlanData || {}} 
-                onSubmit={handleSubmit} 
+            <EditLearningPlanForm
+                initialData={learningPlanData || {}}
+                onSubmit={handleSubmit}
                 isEdit={!!id}
             />
         </div>

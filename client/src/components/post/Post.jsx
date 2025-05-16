@@ -12,6 +12,7 @@ import {
   ShareOutlined as ShareIcon,
 } from "@mui/icons-material";
 import UpdatePost from "../updatepost/updatepost";
+import Profilepicture from "../../assets/profilepic.png";
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
@@ -73,7 +74,13 @@ const Post = ({ post }) => {
         <div className="user">
           <div className="userInfo">
             <img
-              src={post.user?.profilePic || "https://via.placeholder.com/50"}
+              src={
+                          currentUser.profilePic
+                            ? currentUser.profilePic.startsWith("https://")
+                              ? currentUser.profilePic
+                              : `http://localhost:8080/uploads/${currentUser.profilePic}`
+                            : Profilepicture
+                        }
               alt="User"
             />
             <div className="details">

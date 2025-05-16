@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from "react";
+
 import axios from "axios";
 
 export const AuthContext = createContext();
@@ -8,17 +9,14 @@ export const AuthContextProvider = ({ children }) => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (!storedUser) return null;
 
-    // Check if token is expired
     if (new Date().getTime() > storedUser.expiration) {
       localStorage.removeItem("user");
-      return null;
     }
     return storedUser;
   });
 
-  // 🛡 Login method: Save full user info
   const login = (userInfo) => {
-    const expirationTime = new Date().getTime() + 1000 * 60 * 60; // 1 hour expiration
+    const expirationTime = new Date().getTime() + 1000 * 60 * 60;
 
     const userData = {
       token: userInfo.token,

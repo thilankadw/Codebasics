@@ -16,16 +16,19 @@ import { AuthContext } from "../../context/authContext";
 import Update from "../../components/update/Update";
 import axios from "axios";
 import CreatePost from "../../components/createPost/createPost";
+import Profilepicture from "../../assets/profilepic.png";
+import Coverpic from "../../assets/cover.jpg"
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openCreatePost, setOpenCreatePost] = useState(false);
   const [user, setUser] = useState(null);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, logout } = useContext(AuthContext);
   const { id } = useParams();
   const userId = parseInt(id);
-
   const [isFollowed, setIsFollowed] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserAndStatus = async () => {
@@ -61,16 +64,28 @@ const Profile = () => {
       .catch(err => console.error("Error toggling follow status:", err));
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  }
+
   return (
     <div className="profile">
       <div className="images">
         <img
-          src={user?.coverPic ? `http://localhost:8080/uploads/${user.coverPic}` : "/defaultCover.jpg"}
+          src={
+            user?.coverPic ? `http://localhost:8080/uploads/${user.coverPic}` : Coverpic}
           alt="Cover"
           className="cover"
         />
         <img
-          src={user?.profilePic ? `http://localhost:8080/uploads/${user.profilePic}` : "/defaultProfile.jpg"}
+          src={
+            currentUser.profilePic
+              ? currentUser.profilePic.startsWith("https://")
+                ? currentUser.profilePic
+                : `http://localhost:8080/uploads/${currentUser.profilePic}`
+              : Profilepicture
+          }
           alt="Profile"
           className="profilePic"
         />
@@ -90,6 +105,7 @@ const Profile = () => {
                 <>
                   <button onClick={() => setOpenUpdate(true)}>Update Profile</button>
                   <button onClick={() => setOpenCreatePost(true)}>Create Post</button>
+                  <button onClick={handleLogout}>Logout</button>
                 </>
               ) : (
                 <button onClick={handleFollowToggle}>

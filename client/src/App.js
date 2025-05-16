@@ -20,6 +20,7 @@ import RightBar from "./components/rightBar/RightBar";
 import "./style.scss";
 import Friends from "./components/Friends/Friends";
 import FindFriends from "./components/Friends/FindFriends";
+import EditLearningPlanPage from "./pages/learningplan/EditLearningPlanPage";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -90,7 +91,7 @@ function App() {
         },
         {
           path: "/update-learning-plan/:id",
-          element: <CreateLearningPlanPage />,
+          element: <EditLearningPlanPage />,
         },
         {
           path: "/view-learning-plan/:id",

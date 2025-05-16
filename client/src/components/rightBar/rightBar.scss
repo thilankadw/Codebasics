@@ -22,6 +22,7 @@
 
     .container {
       padding: 20px;
+      border-radius: 10px;
 
       .item {
         -webkit-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
@@ -30,6 +31,7 @@
         padding: 20px;
         margin-bottom: 20px;
         background-color: themed("bg");
+        border-radius: 16px;
 
         span {
           color: gray;
@@ -44,8 +46,14 @@
           .userInfo {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 10px;
             position: relative;
+
+            .foloowuserprofile{
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            }
 
             img {
               width: 40px;
@@ -81,9 +89,10 @@
 
             button {
               border: none;
-              padding: 5px;
+              padding: 5px 10px;
               color: white;
               cursor: pointer;
+              border-radius: 50px;
 
               &:first-child {
                 background-color: #5271ff;
