@@ -52,7 +52,7 @@ const ViewAllLearningPlansPage = () => {
       <div className="plans-grid">
         {learningPlans && learningPlans.map(plan => (
           <div key={plan.id} className="plan-card">
-            {plan.imageUrl && <img src="https://res.cloudinary.com/dddahxznm/image/upload/v1745643813/web_developer_illustrator_1_dowg5x.jpg" alt={plan.planName} className="plan-thumbnail" />}
+            {plan.imageUrl && <img src={plan.imageUrl} alt={plan.planName} className="plan-thumbnail" />}
             <h2>{plan.planName}</h2>
             <p>{plan.description}</p>
             <span>Skills: {plan.skills}</span>

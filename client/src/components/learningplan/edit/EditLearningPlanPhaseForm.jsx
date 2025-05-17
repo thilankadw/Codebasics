@@ -66,7 +66,7 @@ const EditLearningPlanPhaseForm = ({ phase, onChange }) => {
                 <textarea name="resources" value={phase.resources} onChange={handleChange} required />
             </div>
 
-            {/* <div className="form-group">
+            <div className="form-group">
                 <label>Upload Image</label>
                 <input type="file" accept="image/*" onChange={handleFileChange} />
                 {uploading && <div className="upload-status">Uploading image...</div>}
@@ -79,7 +79,7 @@ const EditLearningPlanPhaseForm = ({ phase, onChange }) => {
                         <img src={phase.imageUrl} alt="Phase Image" />
                     </div>
                 )}
-            </div> */}
+            </div>
         </div>
     );
 };

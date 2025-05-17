@@ -18,6 +18,39 @@ const EditLearningPlanForm = ({ initialData = {}, onSubmit, isEdit }) => {
 
     const [errors, setErrors] = useState({});
 
+    const handleImageUpload = async (file) => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET);
+
+            const response = await fetch(
+                `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+                { method: 'POST', body: formData }
+            );
+
+            const data = await response.json();
+            setLearningPlan(prev => ({
+                ...prev,
+                imageUrl: data.secure_url
+            }));
+        } catch (error) {
+            console.error("Plan image upload failed", error);
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setLearningPlan(prev => ({
+                ...prev,
+                imageFile: file
+            }));
+            handleImageUpload(file);
+        }
+    };
+
+
     useEffect(() => {
         if (initialData && Object.keys(initialData).length > 0) {
             setLearningPlan({
@@ -30,7 +63,7 @@ const EditLearningPlanForm = ({ initialData = {}, onSubmit, isEdit }) => {
                 ownerId: initialData.ownerId || currentUser?.id || 1,
                 phases: initialData.phases?.map(phase => ({
                     ...phase,
-                    id: phase.id, 
+                    id: phase.id,
                     imageUrl: phase.imageUrl || "https://res.cloudinary.com/dddahxznm/image/upload/v1745645090/programming-background-collage_lotbxs.jpg"
                 })) || []
             });
@@ -42,14 +75,6 @@ const EditLearningPlanForm = ({ initialData = {}, onSubmit, isEdit }) => {
         setLearningPlan(prev => ({
             ...prev,
             [name]: value
-        }));
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setLearningPlan(prev => ({
-            ...prev,
-            imageFile: file
         }));
     };
 
@@ -106,8 +131,12 @@ const EditLearningPlanForm = ({ initialData = {}, onSubmit, isEdit }) => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        onSubmit(learningPlan);
+        const finalPlan = { ...learningPlan };
+        delete finalPlan.imageFile;
+
+        onSubmit(finalPlan);
     };
+
 
     return (
         <form onSubmit={handleSubmit} className="learning-plan-form">
@@ -170,7 +199,7 @@ const EditLearningPlanForm = ({ initialData = {}, onSubmit, isEdit }) => {
                         accept="image/*"
                         onChange={handleFileChange}
                     />
-                    {/* {learningPlan.imageFile ? (
+                    {learningPlan.imageFile ? (
                         <div className="image-preview">
                             <img
                                 src={URL.createObjectURL(learningPlan.imageFile)}
@@ -184,7 +213,7 @@ const EditLearningPlanForm = ({ initialData = {}, onSubmit, isEdit }) => {
                                 alt="Current Image"
                             />
                         </div>
-                    )} */}
+                    )}
                 </div>
             </div>
 

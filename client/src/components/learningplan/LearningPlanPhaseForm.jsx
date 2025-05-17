@@ -17,10 +17,16 @@ const LearningPlanPhaseForm = ({ phase, onChange }) => {
                 { method: 'POST', body: formData }
             );
 
+            if (!response.ok) {
+                throw new Error('Image upload failed');
+            }
+
             const data = await response.json();
             onChange({ ...phase, imageUrl: data.secure_url });
+            toast.success('Phase image uploaded successfully');
         } catch (error) {
-            toast.error('Image upload failed');
+            console.error('Error uploading image:', error);
+            toast.error('Phase image upload failed');
         } finally {
             setUploading(false);
         }
@@ -31,10 +37,15 @@ const LearningPlanPhaseForm = ({ phase, onChange }) => {
         onChange({ ...phase, [name]: value });
     };
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const file = e.target.files[0];
+        if (!file) return;
+        
         onChange({ ...phase, imageFile: file });
+        
+        await handleImageUpload(file);
     };
+
 
     return (
         <div className="phase-form">
@@ -63,15 +74,16 @@ const LearningPlanPhaseForm = ({ phase, onChange }) => {
                 <textarea name="resources" value={phase.resources} onChange={handleChange} required />
             </div>
 
-            {/* <div className="form-group">
+            <div className="form-group">
                 <label>Upload Image</label>
-                <input type="file" accept="image/*" onChange={handleFileChange} />
-                {phase.imageFile && (
+                <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} />
+                {uploading && <span className="upload-status">Uploading...</span>}
+                {phase.imageUrl && (
                     <div className="image-preview">
-                        <img src={URL.createObjectURL(phase.imageFile)} alt="Phase Preview" />
+                        <img src={phase.imageUrl} alt="Phase Preview" />
                     </div>
                 )}
-            </div> */}
+            </div>
         </div>
     );
 };

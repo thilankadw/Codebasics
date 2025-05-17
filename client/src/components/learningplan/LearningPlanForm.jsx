@@ -2,9 +2,11 @@ import React, { useContext, useState } from 'react';
 import LearningPlanPhaseForm from './LearningPlanPhaseForm';
 import './LearningPlanForm.scss';
 import { AuthContext } from '../../context/authContext';
+import { toast } from 'react-toastify';
 
 const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
     const { currentUser } = useContext(AuthContext);
+    const [uploading, setUploading] = useState(false);
 
     const [learningPlan, setLearningPlan] = useState({
         planName: initialData.planName || '',
@@ -26,12 +28,46 @@ const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
         }));
     };
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const file = e.target.files[0];
         setLearningPlan(prev => ({
             ...prev,
             imageFile: file
         }));
+
+        await handleImageUpload(file);
+    };
+
+    const handleImageUpload = async (file) => {
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET);
+
+            const response = await fetch(
+                `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+                { method: 'POST', body: formData }
+            );
+
+            if (!response.ok) {
+                throw new Error('Image upload failed');
+            }
+
+            const data = await response.json();
+
+            console.log(data)
+            setLearningPlan(prev => ({
+                ...prev,
+                imageUrl: data.secure_url
+            }));
+            toast.success('Image uploaded successfully');
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            toast.error('Image upload failed');
+        } finally {
+            setUploading(false);
+        }
     };
 
     const handlePhaseChange = (index, phase) => {
@@ -87,7 +123,15 @@ const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        onSubmit(learningPlan);
+        const submissionData = { ...learningPlan };
+        delete submissionData.imageFile;
+        
+        submissionData.phases = learningPlan.phases.map(phase => {
+            const { imageFile, ...phaseWithoutFile } = phase;
+            return phaseWithoutFile;
+        });
+
+        onSubmit(submissionData);
     };
 
     return (
@@ -144,22 +188,24 @@ const LearningPlanForm = ({ initialData = {}, onSubmit }) => {
                     />
                 </div>
 
-                {/* <div className="form-group full-width">
-                    <label>Upload Image</label>
+                <div className="form-group full-width">
+                    <label>Upload Imagezxzx</label>
                     <input
                         type="file"
                         accept="image/*"
                         onChange={handleFileChange}
+                        disabled={uploading}
                     />
-                    {learningPlan.imageFile && (
+                    {uploading && <span className="upload-status">Uploading...</span>}
+                    {learningPlan.imageUrl && (
                         <div className="image-preview">
                             <img
-                                src={URL.createObjectURL(learningPlan.imageFile)}
-                                alt="Preview"
+                                src={learningPlan.imageUrl}
+                                alt="Plan Cover"
                             />
                         </div>
                     )}
-                </div> */}
+                </div>
             </div>
 
             <div className="phases-section">
