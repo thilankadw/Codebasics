@@ -18,6 +18,7 @@ const Navbar = () => {
   const [notifications, setNotifications] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const unreadCount = notifications.filter(notification => !notification.read).length;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -82,7 +83,12 @@ const Navbar = () => {
 
       <div className="right">
         <div className="notifications">
-          <NotificationsOutlinedIcon className="notificationIcon" onClick={toggleDropdown} />
+          <div className="notification-container">
+            <NotificationsOutlinedIcon className="notificationIcon" onClick={toggleDropdown} />
+            {unreadCount > 0 && (
+              <span className="notification-badge">{unreadCount}</span>
+            )}
+          </div>
           {showDropdown && (
             <div className="dropdown">
               {currentNotifications.map(n => (

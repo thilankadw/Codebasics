@@ -1,9 +1,11 @@
 package com.codebasics.codebasics.service;
 
+import com.codebasics.codebasics.dto.NotificationDTO;
 import com.codebasics.codebasics.model.Post;
 import com.codebasics.codebasics.model.User;
 import com.codebasics.codebasics.repository.PostRepository;
 import com.codebasics.codebasics.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.apache.tika.metadata.Metadata;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +27,8 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    @Autowired
+    private NotificationService notificationService;
 
     @Value("${upload.directory}") // Define upload directory in application.properties
     private String uploadDirectory;
@@ -60,7 +65,17 @@ public class PostService {
         post.setUser(user);
         post.setDescription(description);
         post.setMediaUrls(mediaUrls);
-        return postRepository.save(post);
+
+        Post savedpost = postRepository.save(post);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(userId);
+        notificationDTO.setType("POST_CREATED");
+        notificationDTO.setMessage("Post uploaded successfully.");
+        notificationDTO.setCreatedAt(LocalDateTime.now());
+
+        notificationService.createNotification(notificationDTO);
+        return savedpost;
     }
 
     private boolean isVideoFile(MultipartFile file) {
@@ -111,7 +126,17 @@ public class PostService {
             post.setMediaUrls(mediaUrls);
         }
 
-        return postRepository.save(post);
+        Post updatedtpost = postRepository.save(post);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(post.getUser().getId());
+        notificationDTO.setType("POST_UPDATED");
+        notificationDTO.setMessage("Post updated successfully.");
+        notificationDTO.setCreatedAt(LocalDateTime.now());
+
+        notificationService.createNotification(notificationDTO);
+
+        return updatedtpost;
     }
 
 

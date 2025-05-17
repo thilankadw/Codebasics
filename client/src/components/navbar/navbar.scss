@@ -62,8 +62,28 @@
       .notifications {
         position: relative;
         cursor: pointer;
-        
 
+        .notification-container {
+          position: relative;
+          display: inline-block;
+        }
+
+        .notification-badge {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          background-color: red;
+          color: white;
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: bold;
+        }
+      
         .notificationIcon {
           font-size: 24px;
         }

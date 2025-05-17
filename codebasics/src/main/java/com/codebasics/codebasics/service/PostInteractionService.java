@@ -1,5 +1,6 @@
 package com.codebasics.codebasics.service;
 
+import com.codebasics.codebasics.dto.NotificationDTO;
 import com.codebasics.codebasics.dto.PostInteractionDTO;
 import com.codebasics.codebasics.model.InteractionType;
 import com.codebasics.codebasics.model.Post;
@@ -19,12 +20,12 @@ public class PostInteractionService {
 
     @Autowired
     private PostInteractionRepository postInteractionRepository;
-
     @Autowired
     private PostService postService;
-
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private NotificationService notificationService;
 
     public PostInteractionDTO createPostInteraction(PostInteractionDTO postInteractionDTO) {
         Optional<Post> postOpt = Optional.ofNullable(postService.getPostById(postInteractionDTO.getPostId()));
@@ -62,6 +63,21 @@ public class PostInteractionService {
         postInteraction.setTimestamp(LocalDateTime.now());
 
         PostInteraction savedPostInteraction = postInteractionRepository.save(postInteraction);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(post.getUser().getId());
+        notificationDTO.setCreatedAt(LocalDateTime.now());
+
+        if (postInteractionDTO.getType() == InteractionType.COMMENT) {
+            notificationDTO.setType("COMMENT");
+            notificationDTO.setMessage("User " + postInteractionDTO.getUserId() + " commented on your post.");
+        } else if (postInteractionDTO.getType() == InteractionType.REACTION) {
+            notificationDTO.setType("LIKE");
+            notificationDTO.setMessage("User " + postInteractionDTO.getUserId() + " liked your post.");
+        }
+
+        notificationService.createNotification(notificationDTO);
+
         return modelMapper.map(savedPostInteraction, PostInteractionDTO.class);
     }
 
@@ -84,6 +100,14 @@ public class PostInteractionService {
         postInteraction.setTimestamp(LocalDateTime.now());
 
         PostInteraction updatedPostInteraction = postInteractionRepository.save(postInteraction);
+
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setRecipientUserId(postInteraction.getPost().getUser().getId());
+        notificationDTO.setType("COMMENT_UPDATED");
+        notificationDTO.setMessage("User " + postInteractionDTO.getUserId() + " updated a comment on your post.");
+        notificationDTO.setCreatedAt(LocalDateTime.now());
+
+        notificationService.createNotification(notificationDTO);
 
         return modelMapper.map(updatedPostInteraction, PostInteractionDTO.class);
     }
